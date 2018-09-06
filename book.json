@@ -1,5 +1,6 @@
 
 {
   "title": "CloudSpin Reference",
-  "author": "Kief Morris"
+  "author": "Kief Morris",
+  "plugins": ["asciidoc-admonition-icons"]
 }
