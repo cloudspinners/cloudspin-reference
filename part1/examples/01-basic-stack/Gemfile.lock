@@ -19,9 +19,10 @@ GEM
     cloudspin-stack (0.1.12)
       ruby-terraform
       thor
-    cloudspin-stack-rake (0.1.1)
+    cloudspin-stack-rake (0.1.3)
       cloudspin-stack
       inspec
+      rake
     coderay (1.1.2)
     concurrent-ruby (1.0.5)
     declarative (0.0.10)
@@ -128,6 +129,7 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
     public_suffix (3.0.3)
+    rake (12.3.1)
     representable (3.0.4)
       declarative (< 0.1.0)
       declarative-option (< 0.2.0)

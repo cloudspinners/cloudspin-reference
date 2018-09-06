@@ -1,0 +1,4 @@
+---
+resources:
+  aws_profile: kief-cloudspin
+  assume_role_arn: arn:aws:iam::296570733885:role/spin_stack_manager-skeleton
