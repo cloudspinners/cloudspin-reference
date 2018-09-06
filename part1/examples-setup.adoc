@@ -1,0 +1,55 @@
+:source-highlighter: pygments
+
+= Prerequisites
+
+== Workstation
+
+I develop and test this stuff using a Mac, so my examples tend to be based on this. Everything should work on Linux and even Windows, but you'll probably have to roll up your sleeves a bit to get it working for yourself.
+
+Things you'll need to install:
+
+- AWS CLI (`brew install awscli`)
+- Ruby 2.4 or higher (I use rvm)
+
+== AWS account and credentials
+
+You need an AWS account and API credentials. I strongly recommend you don't use your root account for this, set up an IAM user with more limited role. I recommend you set up an account with very little access other than assume-role, then create an IAM role to assume. (We need instructions for this, at least a link to docs).
+
+The example code is set up to assume an IAM role, to support this way of working.
+
+In your aws credentials file, put the API keys for a user with the right to assume role:
+
+~/.aws/credentials
+[source,ini]
+----
+[my-cloudspin-user]
+aws_access_key_id = AKIAxxxxxxxxxxxxxxxx
+aws_secret_access_key = blahblahblah
+----
+
+Create an IAM role in your AWS account. It should probably be in the Power User group, maybe Administrators for examples later on that do IAM configuration.
+
+In your aws profile config file, create a profile that indicates this IAM role:
+
+~/.aws/config
+[source,ini]
+----
+[profile assume-my-cloudspin-role]
+role_arn = arn:aws:iam::000000000000:role/my-cloudspin-iam-role
+source_profile = my-cloudspin-user
+----
+
+In the cloudspin code examples, when creating an instance you will normally need to pass the names of these two profiles, typically in a configuration file:
+
+~/myproject/stack-instance-local.yaml
+[source,yaml]
+----
+resources:
+  aws_profile: my-cloudspin-user
+  assume_role_arn: arn:aws:iam::000000000000:role/my-cloudspin-iam-role
+----
+
+= Project setup
+
+For each cloudspin project, you will typically need to run `bundle install` before using it, to install Ruby dependencies that are used by the tools.
+

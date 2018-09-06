@@ -1,2 +1,5 @@
 # Creating a simple stack
 
+This section examines the basic parts of a cloudspin stack definition project, and the basic lifecycle of a stack instance. 
+
+, we will examine the structure of a stack definition project, and use this to create and destroy the stack

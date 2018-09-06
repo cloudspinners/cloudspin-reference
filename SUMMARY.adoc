@@ -3,6 +3,7 @@
 . link:README.md[CloudSpin Introduction]
 
 . link:part1/README.adoc[Basic stacks]
+.. link:part1/examples-setup.adoc[Prerequisites for running the example code]
 .. link:part1/stack-starting.adoc[Creating a simple stack]
 .. link:part1/stack-testing.adoc[Testing the simple stack]
 .. link:part1/stack-multiple-instances.adoc[Creating multiple stack instances]
