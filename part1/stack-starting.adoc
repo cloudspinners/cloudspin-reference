@@ -1,5 +1,102 @@
+
 # Creating a simple stack
 
-This section examines the basic parts of a cloudspin stack definition project, and the basic lifecycle of a stack instance. 
+This section examines the basic parts of a cloudspin stack definition project, and the basic lifecycle of a stack instance.
 
-, we will examine the structure of a stack definition project, and use this to create and destroy the stack
+See link:examples-setup.adoc[the setup instructions] for what you need to install and configure to be ready to run this example.
+
+## The example source code
+
+This is in the folder examples/01-basic-stack, available from github at https://github.com/cloudspinners/cloudspin-reference/tree/master/part1/examples/01-basic-stack
+
+This stack simply creates a VPC, and private and public subnets. It isn't particularly useful on its own, since it has no gateways (internet gateway for inbound access, or NAT gateway for outbound), and doesn't even have routes for traffic within the VPC. But it's a start.
+
+
+## The stack definition source
+
+The `./src` subfolder of the project contains the Terraform files which are used to create instances of the stack.
+
+This is a standard Terraform project, you could run the terraform command in it, assuming you provide the required variable, and that you have valid aws credentials as the default profile in `~/.aws/credentials`, or in the relevant evironment variables:
+
+
+[source,console]
+----
+cd src
+terraform init
+terraform plan -var instance_identifier=basic-01-manual
+----
+
+The output should include (among lots of other output) something like:
+
+[source,console]
+----
+An execution plan has been generated and is shown below.
+Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+... <lots of stuff> ...
+
+Plan: 7 to add, 0 to change, 0 to destroy.
+----
+
+Cloudstack provides some tooling to run Terraform. For this example, there's no obvious value, but when you start doing more complicated things, this becomes handier. So let's start using it even for this simple stack, to build an understanding of how it works.
+
+
+## Using the command line tool
+
+The `stack` command-line tool, included in the `cloudspin-stack` gem, can be used to manage stack instances from a stack definition. The main benefit it adds over using the terraform command directly is that it follows certain conventions for finding and passing parameters to an instance, that will make it easier to manage multiple instances from a single stack definition in a consistent way. It also follows conventions for files are organized in the project.
+
+For the example stack, change back into the base folder of the example code (`cd ..` if you ran the commands above), and run the `up` command with the `--dry` option to see the terraform command that will be run:
+
+[source,console]
+----
+stack up --dry basic-01-cli
+----
+
+The output should be similar to:
+
+[source,console]
+----
+$ stack up --dry basic-01-cli
+cd ./work && terraform apply -var 'instance_identifier=basic-01-cli' -state=/Users/you/projects/cloudspin-reference/part1/examples/01-basic-stack/state/stack-basic-01-cli.tfstate
+----
+
+Here you can see that, rather than running the project within the ./src folder, the stack tool copies the source code to another folder, and also stores the local state in a folder it creates. This helps later when creating multiple instances, so that each instance has its own copy of relevant files, rather than stepping on one another and potentially losing state.
+
+You can run the terraform plan command by passing the `--plan` parameter to the `up` command:
+
+[source,console]
+----
+stack up --plan basic-01-cli
+----
+
+The output for this should be similar to when you ran terraform earlier.
+
+To destroy the stack, run `stack down`. You can optionally pass `--dry` to see the terraform command that will be run, and/or `--plan`, to see the changes that will be made to destroy the stack.
+
+[source,console]
+----
+stack down basic-01-cli
+----
+
+### Summary of the command line
+
+The basic commands, as seen in the examples above, are:
+
+|===
+| stack up [instance_identifier] | Create or modify the named stack instance, using the terraform source found in `./src`
+| stack down [instance_identifier] | Destroy the named stack instance
+|===
+
+Both of these commands take the following options:
+
+|===
+| --dry | Print the terraform command line that will be run, but don't actually run it
+| --plan | Run the terraform plan command
+|===
+
+
+The link:../reference/stack-command-line.adoc[stack command line tool reference] has detailed information on the tool, and the link:../reference/cloudspin-project-structure.adoc[cloudspin stack project reference] has more information on the project structure and configuration files.
+

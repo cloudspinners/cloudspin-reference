@@ -53,3 +53,4 @@ resources:
 
 For each cloudspin project, you will typically need to run `bundle install` before using it, to install Ruby dependencies that are used by the tools.
 
+You may also want to install `gem install cloudspin-stack` globally, to get the `stack` command-line tool. (I haven't found a convenient way to have this usable within a project without needing to run `bundle exec stack`).
