@@ -2,4 +2,5 @@
 spin-local.yaml
 bin
 work
+.terraform
 statestack-instance-local.yaml
