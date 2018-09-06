@@ -1,0 +1,8 @@
+require 'rake/clean'
+require 'cloudspin/stack/rake'
+
+CLEAN.include('work')
+CLOBBER.include('state')
+
+Cloudspin::Stack::Rake::StackTask.new(id: 'test-network').instance
+
