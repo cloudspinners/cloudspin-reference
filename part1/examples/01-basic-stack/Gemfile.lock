@@ -16,10 +16,10 @@ GEM
     azure_mgmt_resources (0.17.0)
       ms_rest_azure (~> 0.11.0)
     builder (3.2.3)
-    cloudspin-stack (0.1.12)
+    cloudspin-stack (0.1.14)
       ruby-terraform
       thor
-    cloudspin-stack-rake (0.1.3)
+    cloudspin-stack-rake (0.1.4)
       cloudspin-stack
       inspec
       rake
