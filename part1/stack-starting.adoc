@@ -101,3 +101,58 @@ Both of these commands take the following options:
 
 The link:../reference/stack-command-line.adoc[stack command line tool reference] has detailed information on the tool, and the link:../reference/cloudspin-project-structure.adoc[cloudspin stack project reference] has more information on the project structure and configuration files.
 
+
+## Using a Rakefile
+
+A Rakefile allows you to incorporate more actions and logic into managing your stack and related things.
+
+### Basic rake tasks
+
+To use the cloudspin rake tasks, you'll need to add a Gemfile and Rakefile to your project. The Gemfile should add the `cloudspin-stack-rake` gem:
+
+
+[source,ruby]
+----
+gem 'cloudspin-stack-rake'
+----
+
+Run `bundle install` to actually install the gem, and its dependencies, into your project. This will create a `Gemfile.lock` file, which you can add to your project in source control so that consistent versions of the gems are used wherever the project is checked out and run.
+
+The Rakefile has the logic of the builds. The basic elements for using cloudspin are:
+
+
+[source,ruby]
+----
+require 'cloudspin/stack/rake'
+
+Cloudspin::Stack::Rake::StackTask.new(id: 'test-network').instance
+----
+
+This names the stack instance that will be created *test-network*. When you list the available rake tasks from the command line you see what cloudspin has added:
+
+[source,console]
+----
+$ rake -T
+rake down  # Destroy stack test-network
+rake dry   # Show command line to be run for stack test-network
+rake plan  # Plan changes to stack test-network
+rake up    # Create or update stack test-network
+----
+
+You can see these are variations of the command line tool commands seen above. You have *up* and *down* to create/update and destroy the stack instance. The *dry* and *plan* tasks are applied to the *up* command.
+
+The benefit of using rake is you can add more capabilities. You can easily import the capability for rake to clean up working directories for you:
+
+[source,ruby]
+----
+require 'rake/clean'
+require 'cloudspin/stack/rake'
+
+CLEAN.include('work')
+CLOBBER.include('state')
+
+Cloudspin::Stack::Rake::StackTask.new(id: 'test-network').instance
+----
+
+With this, running `rake clean` will remove the *work* directory, which contains the working files used for the instance. `rake clobber` takes the more drastic step of also deleting the *state* directory, which deletes the local statefile. You should only run this after successfully running `rake down`, otherwise your stack instance will remain in the cloud, and you will no longer be able to use cloudspin (or terraform) to manage it.
+
