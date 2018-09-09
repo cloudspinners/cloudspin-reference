@@ -1,0 +1,2 @@
+# Cloudspin rake task reference
+
