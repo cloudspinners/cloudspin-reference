@@ -130,7 +130,7 @@ Cloudspin::Stack::Rake::StackTask.new(id: 'test-network').instance
 
 This names the stack instance that will be created *test-network*. When you list the available rake tasks from the command line you see what cloudspin has added:
 
-[source,console]
+[source,bash]
 ----
 $ rake -T
 rake down  # Destroy stack test-network
@@ -140,6 +140,9 @@ rake up    # Create or update stack test-network
 ----
 
 You can see these are variations of the command line tool commands seen above. You have *up* and *down* to create/update and destroy the stack instance. The *dry* and *plan* tasks are applied to the *up* command.
+
+
+### Adding a clean task
 
 The benefit of using rake is you can add more capabilities. You can easily import the capability for rake to clean up working directories for you:
 

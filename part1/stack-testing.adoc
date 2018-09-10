@@ -1,1 +1,111 @@
+:source-highlighter: pygments
+
 # Testing the simple stack
+
+Currently, the cloudspin rake library provides support for running https://www.inspec.io/docs/[Inspec] controls (tests) against AWS infrastructure.
+
+The following is based on the https://github.com/cloudspinners/cloudspin-reference/tree/master/part1/examples/01-basic-stack[basic-stack] example project.
+
+
+## Adding the inspec tasks to the Rakefile
+
+You need to declare a _Cloudspin::Stack::Rake::InspecTask_ object in the rakefile, passing it a _StackInstance_ object for the stack instance to test. 
+
+[source,ruby]
+----
+include Cloudspin::Stack::Rake
+
+stack = StackTask.new(id: 'test-network').instance
+InspecTask.new(stack_instance: stack)
+----
+
+This looks for the folder `./test/inspec`, and if found, adds the *inspec* task:
+
+[source,bash]
+----
+$ rake -T
+rake down     # Destroy stack test-network
+rake dry      # Show command line to be run for stack test-network
+rake inspec   # Run inspec tests
+rake plan     # Plan changes to stack test-network
+rake up       # Create or update stack test-network
+----
+
+
+## Running the inspec tests
+
+In the example project, this simply checks that the VPC with the expected name exists.
+
+[source,bash]
+----
+$ rake inspec
+mkdir -p ./work/inspec
+Run inspec
+inspec exec ./test/inspec/. --attrs ./work/inspec/attributes-for-stack-test-network.yml --reporter json-rspec:./work/inspec/results-for-stack-test-network-profile-infrastructure.json cli -t aws://eu-west-1/assume-spin_stack_manager-skeleton
+
+Profile: Controls for AWS resources (infrastructure)
+Version: 0.1.0
+Target:  aws://eu-west-1
+
+  VPCs
+     ✔  name should include "vpc-test-network"
+
+Test Summary: 1 successful, 0 failures, 0 skipped
+----
+
+
+## Writing inspec tests
+
+See the inspec documentation for details on organizing and writing Inspec controls. One bit of support that the cloudspin inspec rake task provides is passing parameters to the inspec controls. By default, all of the stack parameters are made available as attributes within the control.
+
+The example uses the _stack_instance_id_:
+
+[source,ruby]
+----
+title 'vpc'
+
+stack_instance_id = attribute('stack_instance_id', description: 'Which stack to test')
+
+describe aws_vpc_list do
+  its('name') { should include "vpc-#{stack_instance_id}" }
+end
+----
+
+Another test shows that the _region_ parameter has been set (it's set in the file `stack-instance-defaults.yaml`):
+
+
+[source,ruby]
+----
+describe attribute('region', description: 'aws region') do
+  it 'region attribute should be available' do
+    expect(subject).not_to eq('')
+  end
+end
+----
+
+Running `rake inspec` in the example project runs these two controls:
+
+[source,bash]
+----
+$ rake inspec
+mkdir -p ./work/inspec
+Run inspec
+inspec exec ./test/inspec/. --attrs ./work/inspec/attributes-for-stack-test-network.yml --reporter json-rspec:./work/inspec/results-for-stack-test-network-profile-infrastructure.json cli -t aws://eu-west-1/assume-spin_stack_manager-skeleton
+
+Profile: Controls for AWS resources (infrastructure)
+Version: 0.1.0
+Target:  aws://eu-west-1
+
+  VPCs
+     ✔  name should include "vpc-test-network"
+  eu-west-1
+     ✔  region attribute should be available
+
+Test Summary: 2 successful, 0 failures, 0 skipped
+----
+
+
+## Where stuff is
+
+As mentioned previously, cloudspin copies the source code to an instance folder, by default `./work`. The inspec attributes file is automatically generated in `./work/inspec/attributes-for-stack-INSTANCE_NAME.yml`. The log output, useful for debugging failed tests, is put in `./work/inspec/results-for-stack-INSTANCE_NAME-profile-PROFILE_NAME.json`. _PROFILE_NAME_ is set in the inspec profile files (`./test/inspec/inspec.yml`).
+
