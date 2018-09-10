@@ -103,4 +103,3 @@ resources:
 
 Both the command line tool, and the rake task, can override the list of configuration files that will be loaded. See the respective references for them for more information on how to do this.
 
-

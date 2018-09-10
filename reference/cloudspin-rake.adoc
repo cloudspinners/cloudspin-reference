@@ -1,2 +1,92 @@
+:source-highlighter: pygments
+
 # Cloudspin rake task reference
+
+As introduced in the guide to link:../part1/stack-starting.adoc[creating a simple stack], you can include cloudspin tasks in a Rakefile to help you manage stack instances according to the link:cloudspin-project-structure.adoc[stack project structure].
+
+
+## Installing the gem in your project
+
+To use the cloudspin rake tasks, you'll need to add a Gemfile and Rakefile to your project. The Gemfile should add the `cloudspin-stack-rake` gem:
+
+
+[source,ruby]
+----
+gem 'cloudspin-stack-rake'
+----
+
+This gem has `cloudspin-stack` as a dependency, so that gem will also be installed by default, along with a few other dependencies. See the source code for https://github.com/cloudspinners/cloudspin-stack[cloudspin-stack] and https://github.com/cloudspinners/cloudspin-stack-rake[cloudspin-stack-rake].
+
+Run `bundle install` to actually install the gems into your project. This will create a `Gemfile.lock` file, which you can add to your project in source control so that consistent versions of the gems are used wherever the project is checked out and run.
+
+
+## Basic rake tasks for a single stack instance
+
+By creating an instance of the ruby *StackTask* class in your Rakefile, a set of tasks are created to manage a stack instance.
+
+
+[source,ruby]
+----
+require 'cloudspin/stack/rake'
+
+Cloudspin::Stack::Rake::StackTask.new(id: 'test-network').instance
+----
+
+This assumes that the `./src/stack-definition.yaml` exists. It will also look for `./stack-instance-defaults.yaml` and `./stack-instance-local.yaml`, and use these for parameters to pass to terraform. If the Terraform source code under `./src` declares variables without defaults, they will need to be declared in one of these files.
+
+
+### Simplifying StackTask declarations
+
+If you include the module in your rakefile, the code to declare the tasks becomes simpler, which helps if you go beyond the very simple example:
+
+[source,ruby]
+----
+require 'cloudspin/stack/rake'
+include Cloudspin::Stack::Rake
+
+StackTask.new(id: 'test-network').instance
+----
+
+
+### Namespaces
+
+In the above example, the tasks are created in the root namespace. But as you add more things to your rakefile, namespaces are useful to organize code and tasks. Simply wrap the StackTask declaration in a namespace:
+
+[source,ruby]
+----
+require 'rake/clean'
+require 'cloudspin/stack/rake'
+
+CLEAN.include('work')
+CLEAN.include('build')
+CLOBBER.include('state')
+
+include Cloudspin::Stack::Rake
+
+namespace :network do
+  StackTask.new(id: 'test-network').instance
+end
+----
+
+This makes the task list a bit more organized:
+
+[source,bash]
+----
+$ rake -T
+rake clean          # Remove any temporary products
+rake clobber        # Remove any generated files
+rake network:down   # Destroy stack test-network
+rake network:dry    # Show command line to be run for stack test-network
+rake network:plan   # Plan changes to stack test-network
+rake network:up     # Create or update stack test-network
+----
+
+
+## Multiple instances
+
+
+## Testing
+
+
+## Artefact management
 

@@ -46,6 +46,7 @@ In the cloudspin code examples, when creating an instance you will normally need
 ----
 resources:
   aws_profile: my-cloudspin-user
+  assume_role_profile: assume-my-cloudspin-role
   assume_role_arn: arn:aws:iam::000000000000:role/my-cloudspin-iam-role
 ----
 
