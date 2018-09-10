@@ -1,2 +1,4 @@
+:source-highlighter: pygments
+
 # Creating multiple stack instances
 

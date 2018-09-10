@@ -18,7 +18,7 @@ Each stack definition can include the following top level folders and files, whi
 | `./src` | Stack definition code, i.e. Terraform source code (*.tf files)
 | `./test` | Code used to test stack definitions. Not run against production environments, as it may be destructive.
 | `./roles` | Configuration for stack roles (tbc)
-| `./instances` | Configuration for stack instances (tbc)
+| `./environments` | Configuration for stack instances
 | `./pipeline` | Delivery pipeline definition code. Typically run to add pipeline stages to a CI or CD service.
 | `./monitoring` | Code used to monitor stack instances. Typically run to add monitoring checks to a monitoring service. (tbc)
 | `./smoke` | Code to run after provisioning or updating a stack instance, to validate it (tbc)
@@ -30,7 +30,7 @@ Each stack definition can include the following top level folders and files, whi
 
 Some of these are "(tbc)", meaning it's an aspirational thing that hasn't been worked on yet.
 
-There is also at least one file that can be added to local instances of your project, but not added to source control:
+There is also at least one file that can be added to local instances of your project, but which should not added to source control:
 
 |===
 | `./stack-instance-local.yaml` | Override parameter values when you work with stack instances from your local machine. Often used for user-specific information such as AWS profiles to use. Avoid putting secrets in this file, in case it is accidentally committed to a public repository (easier than you think!)
@@ -47,7 +47,7 @@ And, there are a few folders that may be created by cloudspin tools for various 
 |===
 
 
-## Stack definition configuration file
+## Stack definition configuration
 
 As mentioned, the `./src` folder holds the stack definition, i.e. the terraform code. It also normally has a file `./src/stack-definition.yaml`, which includes some configuration information used by the cloudspin tools.
 
@@ -56,50 +56,17 @@ At the moment this is fairly minimal:
 [source,yaml]
 ----
 stack:
-  name: basic-stack-01
+  name: example1
   version: 0.0.1
 ----
 
-These parameters are used by the link:cloudspin-artefacts.adoc[cloudspin artefacts] to name the artefact package for the stack definition.
+|===
+| Option | Description
+
+| stack:name | The name of the stack definition. This is used as the base name for the link:cloudspin-artefacts.adoc[stack definition artefact] package file. It is also used, by default, as the base name for stack instances.
+| stack:version | The version of the stack definition. This is appended to the _stack:name_ to name the artefact package file.
+|===
 
 In the future, things could be added to this file to define integration points and dependencies between stacks.
 
-
-## Configuring stack instances
-
-There are a number of configurations which may be customizable for each stack instance. For example, *parameters* are values that are passed to the infrastructure code (i.e. terraform variables) for the instance. *Resources* are configuration settings which are used to run terraform (and perhaps other tools), but not passed as variables to the terraform code. Examples of resources include AWS credential profiles and roles, and remote state configuration options.
-
-These parameters can be provided in different ways, depending on which tooling is used to manage a stack instance.
-
-
-### Stack instance configuration files
-
-The *stack* command line tool, and the default rake tasks, will look for the following yaml configuration files and load configuration from them if found:
-
-|===
-| `./stack-instance-defaults.yaml`
-| `./stack-instance-local.yaml`
-|===
-
-By convention, the -defaults file is committed to source control, and so has values that may be useful to any instance of the stack.
-
-The -local file is not committed to source control, and so is used by developers to set values they want to use when managing stacks locally, typically while working on the stack definition code.
-
-Any configuration values found in `./stack-instance-local.yaml` will override values defined in `./stack-instance-defaults.yaml`.
-
-These yaml files (currently) have two top level options, `parameters` and `resources`. Here's an example:
-
-[source,yaml]
-----
-parameters:
-  region: "eu-west-1"
-  availability_zones: "eu-west-1a,eu-west-1b,eu-west-1c"
-resources:
-  aws_profile: my-cloudspin-user
-  assume_role_arn: arn:aws:iam::000000000000:role/my-cloudspin-iam-role
-----
-
-### Overriding the instance configuration file locations
-
-Both the command line tool, and the rake task, can override the list of configuration files that will be loaded. See the respective references for them for more information on how to do this.
 

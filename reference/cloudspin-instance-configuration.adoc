@@ -1,0 +1,87 @@
+:source-highlighter: pygments
+
+# Reference: Cloudspin stack instance configuration
+
+
+There are a number of configuration option types which may be customizable for each stack instance. For example, *parameters* are values that are passed to the infrastructure code (i.e. terraform variables) for the instance. *Resources* are configuration settings which are used to run terraform (and perhaps other tools), but not passed as variables to the terraform code. Examples of resources include AWS credential profiles and roles, and remote state configuration options.
+
+*Instance* configuration options are used by cloudspin, see the reference details below.
+
+These parameters can be provided in different ways, depending on which tooling is used to manage a stack instance.
+
+
+## Stack instance configuration files
+
+The *stack* command line tool, and the default rake tasks, will look for the following yaml configuration files and load configuration from them if found:
+
+|===
+| `./stack-instance-defaults.yaml`
+| `./stack-instance-local.yaml`
+|===
+
+By convention, the -defaults file is committed to source control, and so has values that may be useful to any instance of the stack.
+
+The -local file is not committed to source control, and so is used by developers to set values they want to use when managing stacks locally, typically while working on the stack definition code.
+
+Any configuration values found in `./stack-instance-local.yaml` will override values defined in `./stack-instance-defaults.yaml`.
+
+These yaml files (currently) have two top level options, `parameters` and `resources`. Here's an example:
+
+[source,yaml]
+----
+instance:
+  group: sandbox
+parameters:
+  region: "eu-west-1"
+  availability_zones: "eu-west-1a,eu-west-1b,eu-west-1c"
+resources:
+  aws_profile: my-cloudspin-user
+  assume_role_arn: arn:aws:iam::000000000000:role/my-cloudspin-iam-role
+----
+
+### Overriding the instance configuration file locations
+
+Both the command line tool, and the rake task, can override the list of configuration files that will be loaded. See the respective references for them for more information on how to do this.
+
+
+## Special stack instance variables
+
+|===
+| Variable | Description | Where it's set
+
+| stack:name | The name of the stack definition. | This will be set automatically by cloudspin when creating the StackInstance from the definition.
+| stack:role | Configurations that can be applied to a stack definition for a particular purpose. See link:cloudspin-stack-roles.adoc[roles]. | This would normally be set in a file in `./roles`. But it hasn't been implemented yet, so we'll see.
+| instance:group | An ID that is used to tie a collection of stack instances together. This is usually an environment. | Usually set in the instance configuration file (instance:group), although it could be overridden on the command line, or by passing something into a rake task.
+| instance:liveset (TBC) | An ID used to allow multiple instances to co-exist for a period, for instance for blue-green, canary, or other interesting deployment strategies. | Not implemented yet, who knows.
+| instance_identifier | A unique name across all stack instances. | See below.
+|===
+
+
+
+### Stack instance identifier
+
+Cloudspin sets and uses a string named *instance_identifier* for multiple purposes. It is assumed to be unique across all stack instances (within a given AWS account, and within any collections of stacks that might be integrated in any way). By convention, it will be used to name various files that cloudspin uses, which may include working files, statefiles, configuration registry entries, etc.
+
+The instance_identifier can be set explicitly in various ways, e.g. as a command line parameter to the _stack_ tool, parameters passed to cloudspin-rake tasks, or in a stack instance configuration file:
+
+[source,yaml]
+----
+instance:
+  identifier: example1-sandbox
+----
+
+If the variable is not explicitly set, cloudspin will generate it, setting it to *stack:name*-*stack:role*-*instance:group*. If either or both of _stack:role_ and _instance:group_ are not set, they will not be included in the name (and neither will the dashes.)
+
+So example values for instance_identifier include:
+
+
+|===
+| stack:name | stack:role | instance:group | value of `instance_identifer`
+
+| webserver | myapp | staging | *webserver-myapp-staging*
+| webserver | (not set) | staging | *webserver-staging* 
+| webserver | myapp | (not set) | *webserver-myapp*
+| webserver | (not set) | (not set) | *webserver*
+|===
+
+

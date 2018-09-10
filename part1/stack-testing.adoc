@@ -76,7 +76,8 @@ Another test shows that the _region_ parameter has been set (it's set in the fil
 
 [source,ruby]
 ----
-describe attribute('region', description: 'aws region') do
+aws_region = attribute('region', description: 'aws region')
+describe aws_region do
   it 'region attribute should be available' do
     expect(subject).not_to eq('')
   end

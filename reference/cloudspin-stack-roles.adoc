@@ -1,0 +1,21 @@
+:source-highlighter: pygments
+
+# Reference: Cloudspin stack roles
+
+WARNING: This is not yet implemented.
+
+A stack role is a set of configuration defaults applied on top of a stack definition. The idea is that you can have re-usable code for an infrastructure concept - a webserver, database cluster, etc. - and then have a role that configures it more specifically. Roles are typically related to a particular service or application. You can then create multiple instances of a stack role, for example one in each environment.
+
+For example. Let's say you have two applications, appA and appB. The service infrastructure stack is pretty much the same for both - application server, database cluster, security groups and load balancer. You want to use the same Terraform code for both. But you want to be able to deploy an instance of both applications in each of your environments - qa, staging, and production. So the stack instances need to have different names.
+
+So you'd end up with:
+
+- service-appA-qa
+- service-appB-qa
+- service-appA-staging
+- service-appB-staging
+- service-appA-production
+- service-appB-production
+
+You may also want to tailor the configuration for each application, without needing to change the Terraform source code. Maybe you pass a variable to install the relevant application code, or set some URL path details.
+

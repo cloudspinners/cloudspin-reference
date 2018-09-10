@@ -12,6 +12,8 @@
 .. link:part1/stack-roles.adoc[Using a stack definition for multiple roles]
 . link:reference/README.adoc[Reference topics]
 .. link:reference/cloudspin-project-structure.adoc[Cloudspin project structure]
+.. link:reference/cloudspin-instance-configuration.adoc[Cloudspin instance configuration]
+.. link:reference/cloudspin-stack-roles.adoc[Cloudspin stack roles]
 .. link:reference/stack-command-line.adoc[Stack command line tool]
 .. link:reference/cloudspin-ruby-api.adoc[Cloudspin Ruby classes]
 .. link:reference/cloudspin-rake.adoc[Cloudspin Rake tasks]
