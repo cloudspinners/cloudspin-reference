@@ -1,6 +1,7 @@
 /.bundle/
-spin-local.yaml
+state
 bin
 work
+state
 .terraform
-statestack-instance-local.yaml
+stack-instance-local.yaml
