@@ -19,7 +19,7 @@ GEM
     cloudspin-stack (0.1.14)
       ruby-terraform
       thor
-    cloudspin-stack-rake (0.1.6)
+    cloudspin-stack-rake (0.1.7)
       cloudspin-stack
       inspec
       rake
