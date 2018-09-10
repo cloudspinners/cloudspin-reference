@@ -8,9 +8,8 @@ describe aws_vpc_list do
   its('name') { should include "vpc-#{stack_instance_id}" }
 end
 
-region = attribute('region', description: 'aws region')
-describe region do
+describe attribute('region', description: 'aws region') do
   it 'region attribute should be available' do
-    subject.should_not eq('')
+    expect(subject).not_to eq('')
   end
 end

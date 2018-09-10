@@ -1,5 +1,5 @@
-name: infrastructure
-title: Controls for AWS resources
+name: basic-stack-01
+title: Controls for example project
 maintainer: Kief Morris
 copyright: Kief Morris
 copyright_email: cloudspin@kief.com
