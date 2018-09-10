@@ -7,9 +7,5 @@ CLOBBER.include('state')
 include Cloudspin::Stack::Rake
 
 stack = StackTask.new(id: 'test-network').instance
-aws_region = stack.parameter_values['region']
-aws_profile = stack.resource_values['assume_role_profile']
-
-InspecTask.new(stack_instance: stack,
-               inspec_target: "aws://#{aws_region}/#{aws_profile}")
+InspecTask.new(stack_instance: stack)
 
