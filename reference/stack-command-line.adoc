@@ -14,7 +14,10 @@ gem install cloudspin-stack
 stack help
 ----
 
+
 ## Commands
 
-For the most part, the commands and usage are documented when you run `stack help`. By default, it assumes it is being run in a directory that contains a stack definition in `./src/stack-definition.yaml`, and that a stack instance configuration can be found across the files `./stack-instance-defaults.yaml` and `./stack-instance-local.yaml`. The project structure and configuration is described in the link:cloudspin-project-structure.adoc[stack project structure reference].
+The most up to date documentation of commands and options is available by running `stack help`.
+
+The tool assumes it is being run in a directory that follows the project structure as described in the link:cloudspin-project-structure.adoc[stack project structure reference], and documentation files as in the link:cloudspin-instance-configuration.adoc[stack instance configuration reference].
 
