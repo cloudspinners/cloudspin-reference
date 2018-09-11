@@ -6,6 +6,6 @@ CLOBBER.include('state')
 
 include Cloudspin::Stack::Rake
 
-stack = StackTask.new(id: 'test-network').instance
+stack = StackTask.new.instance
 InspecTask.new(stack_instance: stack)
 
