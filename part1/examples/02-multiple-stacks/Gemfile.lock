@@ -3,23 +3,23 @@ GEM
   specs:
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
-    aws-sdk (2.11.126)
-      aws-sdk-resources (= 2.11.126)
-    aws-sdk-core (2.11.126)
+    aws-sdk (2.11.127)
+      aws-sdk-resources (= 2.11.127)
+    aws-sdk-core (2.11.127)
       aws-sigv4 (~> 1.0)
       jmespath (~> 1.0)
-    aws-sdk-resources (2.11.126)
-      aws-sdk-core (= 2.11.126)
+    aws-sdk-resources (2.11.127)
+      aws-sdk-core (= 2.11.127)
     aws-sigv4 (1.0.3)
     azure_graph_rbac (0.17.0)
       ms_rest_azure (~> 0.11.0)
     azure_mgmt_resources (0.17.0)
       ms_rest_azure (~> 0.11.0)
     builder (3.2.3)
-    cloudspin-stack (0.1.14)
+    cloudspin-stack (0.1.16)
       ruby-terraform
       thor
-    cloudspin-stack-rake (0.1.7)
+    cloudspin-stack-rake (0.1.8)
       cloudspin-stack
       inspec
       rake

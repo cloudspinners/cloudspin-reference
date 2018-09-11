@@ -25,7 +25,7 @@ The -local file is not committed to source control, and so is used by developers
 
 Any configuration values found in `./stack-instance-local.yaml` will override values defined in `./stack-instance-defaults.yaml`.
 
-These yaml files (currently) have two top level options, `parameters` and `resources`. Here's an example:
+These yaml files (currently) have three top level groups of configuration: *instance*, *parameters*, and *resources*. Here's an example:
 
 [source,yaml]
 ----
@@ -38,6 +38,11 @@ resources:
   aws_profile: my-cloudspin-user
   assume_role_arn: arn:aws:iam::000000000000:role/my-cloudspin-iam-role
 ----
+
+* *instance* configuration options are used by cloudspin, although they are often also used within infrastructure code as well (e.g. to tag resources)
+* *parameters* are passed to the infrastructure code, i.e. as Terraform variables
+* *resources* are used by the infrastructure tool, i.e. Terraform, to configure things like authentication, statefile options, etc.
+
 
 ### Overriding the instance configuration file locations
 

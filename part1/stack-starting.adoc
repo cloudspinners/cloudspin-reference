@@ -53,15 +53,15 @@ For the example stack, change back into the base folder of the example code (`cd
 
 [source,console]
 ----
-stack up --dry basic-01-cli
+stack up --dry
 ----
 
 The output should be similar to:
 
 [source,console]
 ----
-$ stack up --dry basic-01-cli
-cd ./work && terraform apply -var 'instance_identifier=basic-01-cli' -state=/Users/you/projects/cloudspin-reference/part1/examples/01-basic-stack/state/stack-basic-01-cli.tfstate
+$ stack up --dry
+cd ./work && terraform apply -var 'region=eu-west-1' -var 'availability_zones=eu-west-1a,eu-west-1b,eu-west-1c' -var 'instance_identifier=basic-stack-01' -state=/Users/you/cloudspin-reference/part1/examples/01-basic-stack/state/stack-basic-stack-01.tfstate
 ----
 
 Here you can see that, rather than running the project within the ./src folder, the stack tool copies the source code to another folder, and also stores the local state in a folder it creates. This helps later when creating multiple instances, so that each instance has its own copy of relevant files, rather than stepping on one another and potentially losing state.
@@ -70,7 +70,7 @@ You can run the terraform plan command by passing the `--plan` parameter to the 
 
 [source,console]
 ----
-stack up --plan basic-01-cli
+stack up --plan
 ----
 
 The output for this should be similar to when you ran terraform earlier.
@@ -79,7 +79,7 @@ To destroy the stack, run `stack down`. You can optionally pass `--dry` to see t
 
 [source,console]
 ----
-stack down basic-01-cli
+stack down
 ----
 
 ### Summary of the command line
@@ -87,8 +87,8 @@ stack down basic-01-cli
 The basic commands, as seen in the examples above, are:
 
 |===
-| stack up [instance_identifier] | Create or modify the named stack instance, using the terraform source found in `./src`
-| stack down [instance_identifier] | Destroy the named stack instance
+| stack up | Create or modify the stack instance, using the terraform source found in `./src`
+| stack down  | Destroy the stack instance
 |===
 
 Both of these commands take the following options:
@@ -105,6 +105,7 @@ The link:../reference/stack-command-line.adoc[stack command line tool reference]
 ## Using a Rakefile
 
 A Rakefile allows you to incorporate more actions and logic into managing your stack and related things.
+
 
 ### Basic rake tasks
 
