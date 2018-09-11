@@ -7,5 +7,6 @@ resource "aws_subnet" "public" {
   tags {
     Name = "public-subnet-${var.instance_identifier}-${element(split (",", var.availability_zones), count.index)}"
     InstanceIdentifier = "${var.instance_identifier}"
+    EnvironmentName = "${var.environment_name}"
   }
 }
