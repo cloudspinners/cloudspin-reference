@@ -2,3 +2,98 @@
 
 # Creating multiple stack instances
 
+This section walks through an example stack project that has multiple environments.
+
+## The example source code
+
+The example project is in the folder examples/02-multiple-stacks, available from github at https://github.com/cloudspinners/cloudspin-reference/tree/master/part1/examples/02-multiple-stacks.
+
+This project creates some networking structures, just like the 01-simple-stack project, although it adds a _EnvironmentName_ tag to the resources.
+
+
+## Environment configuration options
+
+This project adds some new parameters to the `stack-instance-defaults.yaml` file:
+
+[source,yaml]
+----
+instance:
+  group: NOT_SET
+parameters:
+  region: "eu-west-1"
+  availability_zones: "eu-west-1a,eu-west-1b,eu-west-1c"
+  environment_name: NOT_SET
+----
+
+`parameters:environment_name` is passed to terraform, so it can be assigned to resource tags. This is purely a convention - nothing in cloudspin itself insists on this.
+
+`instance:group` is used by the cloudspin tools to build unique a `instance_identifier` for each stack instance. Before, the instance_identifier was set to *`STACK_NAME`*, which was taken from the _stack:name_ options set in the stack definition file `./src/stack-definition.yaml`. Now, _instance:group_ is added to it, so the the instance_identifier is set to *`STACK_NAME-INSTANCE_GROUP`*.
+
+In this example, the stack name is _example2_, so if you were to run `stack up`, it would use `instance_identifier=example2-NOT_SET`.
+
+
+[source,console]
+----
+$ stack up --dry
+cd /Users/you/spin/cloudspin-reference/part1/examples/02-multiple-stacks/work/example2-NOT_SET && terraform apply -var 'region=eu-west-1' -var 'availability_zones=eu-west-1a,eu-west-1b,eu-west-1c' -var 'environment_name=NOT_SET' -var 'aws_profile=my-cloudspin-user' -var 'assume_role_profile=assume-my-cloudspin-role' -var 'assume_role_arn=arn:aws:iam::000000000000:role/my-cloudspin-iam-role' -var 'instance_identifier=example2-NOT_SET' -state=/Users/you/spin/cloudspin-reference/part1/examples/02-multiple-stacks/state/example2-NOT_SET/stack-example2-NOT_SET.tfstate
+----
+
+
+## Environment configuration files
+
+It would be useful to set configuration options for multiple environments. This can be done by creating files in a folder called `./environments`, each file being named `stack-instance-ENVIRONMENT_NAME.yaml`.
+
+[source,yaml]
+----
+instance:
+  group: sandbox
+parameters:
+  environment_name: sandbox
+----
+
+This example overrides the _instance:group_ value and the _environment_name_ parameter, but you could override other variables as well.
+
+To use this with the stack tool, use the -e flag to pass the ENVIRONMENT_NAME to the tool:
+
+[source,console]
+----
+$ stack up --dry -e sandbox
+cd /Users/you/spin/cloudspin-reference/part1/examples/02-multiple-stacks/work/example2-sandbox && terraform apply -var 'region=eu-west-1' -var 'availability_zones=eu-west-1a,eu-west-1b,eu-west-1c' -var 'environment_name=sandbox' -var 'instance_identifier=example2-sandbox' -state=/Users/you/spin/cloudspin-reference/part1/examples/02-multiple-stacks/state/example2-sandbox/stack-example2-sandbox.tfstate
+----
+
+The stack tool looks for the environment configuration file based on the name passed to the -e flag.
+
+
+## Rakefiles and multiple stack instances
+
+You can create multiple `StackTask` instances in your rakefile, passing an environment string to each one. Like the stack command line tool, the stack rake task will search for the environment configuration file using this string, and use that to configure the stack instance.
+
+This example iterates over each environment name in an array, creating a namespace for each:
+
+[source,ruby]
+----
+require 'cloudspin/stack/rake'
+include Cloudspin::Stack::Rake
+
+['sandbox', 'staging'].each { |environment|
+  namespace "#{environment}" do
+    StackTask.new(environment).instance
+  end
+}
+----
+
+So the rake tasks are grouped by a namespace for each environment:
+
+[source,console]
+----
+$ rake -T
+rake sandbox:down    # Destroy stack example2-sandbox
+rake sandbox:dry     # Show command line to be run for stack example2-sandbox
+rake sandbox:plan    # Plan changes to stack example2-sandbox
+rake sandbox:up      # Create or update stack example2-sandbox
+rake staging:down    # Destroy stack example2-staging
+rake staging:dry     # Show command line to be run for stack example2-staging
+rake staging:plan    # Plan changes to stack example2-staging
+rake staging:up      # Create or update stack example2-staging
+----
+
