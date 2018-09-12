@@ -1,7 +1,0 @@
-/.bundle/
-state
-bin
-work
-state
-.terraform
-stack-instance-local.yaml

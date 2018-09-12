@@ -1,5 +1,0 @@
-source 'https://rubygems.org'
-
-gem 'cloudspin-stack-rake'
-# gem 'cloudspin-stack', :path => '/Users/kmorris/projects/spin/cloudspin-stack'
-# gem 'cloudspin-stack-rake', :path => '/Users/kmorris/projects/spin/cloudspin-stack-rake'

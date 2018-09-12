@@ -1,5 +1,0 @@
----
-resources:
-  aws_profile: your-profile
-  assume_role_profile: profile-for-assuming-role
-  assume_role_arn: arn:aws:iam::xxxxxxxxxxxx:role/role_name
