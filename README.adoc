@@ -7,6 +7,11 @@ I'd like to see this evolve into a community-driven set of tools and template pr
 Feel free to copy and use material from here (subject to the terms of the MIT license), but you will need to modify and extend it to make it useful for your own project.
 
 
+[NOTE]
+====
+The https://github.com/cloudspinners/[Cloudspinners repositories on Github] have the source code of the cloudspin tools, example projects, and this reference documentation.
+====
+
 == Why Cloudspin?
 
 Currently, most people and teams managing infrastructure with tools such as Terraform, CloudFormation, etc. define their own unique project structures, and write their own unique wrapper scripts (using make, shell, rake, or whatever) to run that tool and associated tasks. Essentially, each project is a special snowflake.
