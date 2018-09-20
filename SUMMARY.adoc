@@ -1,15 +1,50 @@
 # Cloudspin Reference
 
-. link:README.md[CloudSpin Introduction]
+. link:README.adoc[CloudSpin Introduction]
 
-. link:example-project/README.adoc[Example project]
-.. link:example-project/examples-setup.adoc[Prerequisites]
-.. link:example-project/stack-starting.adoc[Creating a simple stack]
-.. link:example-project/stack-testing.adoc[Testing the simple stack]
-.. link:example-project/stack-multiple-instances.adoc[Creating multiple stack instances]
-.. link:example-project/stack-parameters.adoc[Using parameters for stack instances]
-.. link:example-project/stack-pipelines.adoc[Delivering the stack using a pipeline]
-.. link:example-project/stack-roles.adoc[Using a stack definition for multiple roles]
+## Tutorials
+
+. link:00-starting/todo.adoc[Getting started]
+.. link:00-starting/README.adoc[Concept: What is a stack?]
+.. link:00-starting/examples-setup.adoc[Setting up for the tutorials]
+
+. link:01-basic-stack/todo.adoc[Tutorial 01 - creating a simple stack]
+.. link:01-basic-stack/stack-starting.adoc[Creating a simple stack]
+.. link:01-basic-stack/stack-testing.adoc[Testing the simple stack]
+
+. link:02-environments/todo.adoc[Tutorial 02 - multiple environments]
+.. link:02-environments/stack-multiple-instances.adoc[Creating multiple stack instances]
+.. link:02-environments/stack-parameters.adoc[Using parameters for stack instances]
+
+. link:03-aws-setup/README.adoc[Tutorial 03 - setting up AWS]
+.. link:03-aws-setup/todo.adoc[Defining IAM roles]
+.. link:03-aws-setup/todo.adoc[Setting up remote state]
+
+. link:04-pipelines/todo.adoc[Tutorial 04 - Infrastructure pipeline for a stack]
+.. link:04-pipelines/stack-pipelines.adoc[Delivering the stack using a pipeline]
+.. link:04-pipelines/pipeline-parameters.adoc[Defining stack parameters in the pipeline]
+.. link:04-pipelines/todo.adoc[Ephemeral stack testing stage]
+.. link:04-pipelines/todo.adoc[Persistent stack testing stage]
+
+. link:05-split-stacks/README.adoc[Tutorial 05 - Splitting infrastructure across stacks]
+.. link:05-split-stacks/todo.adoc[Shared VPC stack]
+.. link:05-split-stacks/todo.adoc[Tutorial 04 - Shared VPC stack]
+
+. link:example-project/todo.adoc[Tutorial X - Data and persistence]
+
+. link:example-project/todo.adoc[Tutorial X - Provisioning a server]
+
+. link:example-project/todo.adoc[Tutorial X - Testing server configuration definitions]
+
+. link:example-project/todo.adoc[Tutorial X - Building a server image]
+
+. link:example-project/todo.adoc[Tutorial X - Configuration and dependency registry]
+.. link:example-project/todo.adoc[Defining stack parameters in a registry]
+.. link:example-project/todo.adoc[Using a registry for dependencies]
+
+
+## Reference
+
 . link:reference/README.adoc[Cloudspin Reference]
 .. link:reference/cloudspin-project-structure.adoc[Cloudspin project structure]
 .. link:reference/cloudspin-instance-configuration.adoc[Cloudspin instance configuration]
