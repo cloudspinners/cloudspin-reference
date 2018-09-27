@@ -1,0 +1,103 @@
+:source-highlighter: pygments
+
+= Set up IAM roles
+
+== (2) Create an unprivileged user
+
+Create a user (for example, _spin_user_) with no privileges, but which has an API access key, but no console access.
+
+
+=== (2.1) Add the unprivileged user to the AWS credentials file
+
+
+File: `~/.aws/credentials`:
+[source,ini]
+----
+[spin_YOURNAME]
+aws_access_key_id = AKIA........
+aws_secret_access_key = xxxxxxxxxxx
+----
+
+
+## (3) Add the bootstrap user to the stack-instance-local.yaml file
+
+This should be temporary, only done in order to apply the iam-roles in the first place.
+
+File: `./stack-instance-local.yaml`
+[source,yaml]
+----
+resources:
+  aws_profile: spin_bootstrap
+  assume_role_profile:
+  assume_role_arn:
+parameters:
+  managed_stack_name: YOUR_STACK_HERE
+  stack_manager_users:
+    - spin_YOURNAME
+----
+
+You might also/instead define the `stack_manager_users` list in an `./environments/stack-instance-ENVIRONMENT.yaml` file, depending on how you plan to manage roles and environments. (At the moment, this stack doesn't do anything clever to support giving different rights to users rights in different environments.)
+
+
+## (4) Apply the iam-roles stack
+
+Once you have this all in place, you can plan and provision the stack. Do this by applying the stack, setting environment variables to use the bootstrap credentials.
+
+[source,console]
+----
+rake plan
+rake up
+----
+
+## (5) Replace the bootstrap configuration with the unprivileged user configuration
+
+In your `~/.aws/credentials`:
+
+[source,ini]
+----
+[spin_YOURNAME]
+aws_access_key_id = AKIA........
+aws_secret_access_key = xxxxxxxxxxx
+----
+
+Add an assume-role profile to your `~/.aws/config`:
+
+[source,ini]
+----
+[profile assume-IAM_ROLE-YOUR_STACK]
+role_arn = arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/spin_role-YOUR_STACK-ROLE
+source_profile = IAM_USER_PROFILE_FROM_YOUR_CREDENTIALS_FILE
+----
+
+For example:
+
+[source,ini]
+----
+[profile assume-spin_network-manager]
+role_arn = arn:aws:iam::000000000000:role/spin_role-spin_network-manager
+source_profile = spin_YOURNAME
+----
+
+Then in your stack configuration:
+
+File: `./stack-instance-local.yaml`
+[source,yaml]
+----
+resources:
+  aws_profile: spin_YOURNAME
+  assume_role_profile: assume-YOUR_STACK_HERE-manager
+  assume_role_arn: arn:aws:iam::000000000000:role/spin_role-spin_network-manager
+parameters:
+  managed_stack_name: YOUR_STACK
+  stack_manager_users:
+    - spin_YOURNAME
+----
+
+## (6) Test it
+
+(Note: this currently requires doing the previous configuration step for role *spin_role-spin_network-manager* account, as it requires some extra permissions to run these tests)
+
+[source,bash]
+----
+rake test
+----

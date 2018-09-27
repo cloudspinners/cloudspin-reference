@@ -6,7 +6,10 @@
 
 . link:00-starting/todo.adoc[Getting started]
 .. link:00-starting/README.adoc[Concept: What is a stack?]
-.. link:00-starting/examples-setup.adoc[Setting up for the tutorials]
+.. link:00-starting/setup-workstation.adoc[Set up your local tools]
+.. link:00-starting/setup-aws.adoc[Bootstrap your AWS account]
+.. link:00-starting/setup-statebucket.adoc[Set up a remote state bucket]
+.. link:00-starting/setup-iam-roles.adoc[Set up IAM roles]
 
 . link:01-basic-stack/todo.adoc[Tutorial 01 - creating a simple stack]
 .. link:01-basic-stack/stack-starting.adoc[Creating a simple stack]
@@ -17,8 +20,6 @@
 .. link:02-environments/stack-parameters.adoc[Using parameters for stack instances]
 
 . link:03-aws-setup/README.adoc[Tutorial 03 - setting up AWS]
-.. link:03-aws-setup/todo.adoc[Defining IAM roles]
-.. link:03-aws-setup/todo.adoc[Setting up remote state]
 
 . link:04-pipelines/todo.adoc[Tutorial 04 - Infrastructure pipeline for a stack]
 .. link:04-pipelines/stack-pipelines.adoc[Delivering the stack using a pipeline]
@@ -53,6 +54,7 @@
 .. link:reference/cloudspin-ruby-api.adoc[Cloudspin Ruby classes]
 .. link:reference/cloudspin-rake.adoc[Cloudspin Rake tasks]
 .. link:reference/cloudspin-artefacts.adoc[Cloudspin Artefacts]
+.. link:reference/todo.adoc[Terraform Statefiles with Cloudspin]
 . link:reference/resources.adoc[Resources]
 .. https://cloudspin.io/[Cloudspin reference site]
 .. https://github.com/cloudspinners/cloudspin-reference-examples[Example project source code]

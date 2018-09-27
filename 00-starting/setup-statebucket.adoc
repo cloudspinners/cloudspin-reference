@@ -1,0 +1,83 @@
+:source-highlighter: pygments
+
+= Create a remote statebucket
+
+The cloudspin example code is implemented in Terraform, which uses https://www.terraform.io/docs/state/[state files] to map the resources it manages to your project code.
+
+There are various ways to manage Terraform state, in our case, we will store it in an S3 bucket. This preserves the state in the event that anything happens to your local files (e.g. accidentally deleting local statefiles). It also allows multiple people to work on the same infrastructure instances.
+
+
+== State for your statebucket
+
+Where does the statefile for the stack that manages your statefile bucket live? At the moment, this code manages the state for this locally.
+
+
+== Planning and creating your statebucket
+
+The folder `00-statebucket` has a cloudspin project that will create a statebucket for you. This uses the https://github.com/cloudspinners/spin-stack-s3bucket[s3bucket stack] definition. Here's how to do it.
+
+
+=== (1) Create a local configuration file
+
+Create a file `00-statebucket/stack-statebucket-local.yaml` (you can copy `00-statebucket/stack-statebucket-local-example.yaml` as a starter), and edit it:
+
+[source,yaml]
+----
+instance:
+  group: YOURNAME_sandbox
+resources:
+  aws_profile: YOUR_PROFILE
+----
+
+_YOUR_PROFILE_ will be the profile of the bootstrap AWS API keys you created if you followed the steps in the link:00-starting/setup-aws.adoc[previous page].
+
+The `group` setting doesn't matter too much. It's essentially an ID for your environment, which, in more complex setups, can be used to integrate different things together.
+
+
+=== (2) Initialize the local project tooling
+
+In your `00-statebucket` folder, run:
+
+[source,console]
+----
+bundle install
+----
+
+This installs some Ruby gems that include the cloudspin tools we use in these examples. This is essentially a one-off, but when you want to update to newer versions of the tools, you'd run `bundle update`.
+
+
+=== (3) Plan the bucket creation
+
+Now you can see what changes Terraform will make:
+
+[source,console]
+----
+rake plan
+----
+
+This downloads the https://github.com/cloudspinners/spin-stack-s3bucket[cloudspin s3 bucket stack definition] code, and then runs `terraform plan`.
+
+
+=== (4) Create the bucket
+
+[source,console]
+----
+rake up
+----
+
+Now you should have an S3 bucket that can be used for storing Terraform state. You'll need the name of the bucket to put into configuration for further examples. The name should be something like: `statebucket-cloudspin-examples-xxxxxxxxxxxx`, where the number at the end is your AWS account ID (which is needed to make sure the bucket name is globally unique).
+
+
+=== Did you do all that?
+
+If you've simply followed all of these instructions, you have potentially put yourself at risk. This project code could easily have been created by someone unscrupulous. Even if you trust me and know this is my project, someone else could have compromised my project code, and inserted code to exploit your AWS account.
+
+You should make it a habit to carefully vet code before you download and apply it.
+
+In this case, the Ruby gems will have been downloaded into your local Ruby library folder, and the Terraform code will have been downloaded to `./00-statebucket/.cloudspin`. I'd encourage you to review this code and make sure you're comfortable with what it does before running it.
+
+
+== What next?
+
+Now you can proceed to link:00-starting/setup-iam-roles.adoc[setting up IAM roles] to use your AWS account a bit more securely.
+

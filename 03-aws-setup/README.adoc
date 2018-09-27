@@ -1,3 +1,7 @@
 :source-highlighter: pygments
 
 = Setting up for more advanced AWS usage
+
+Multiple accounts?
+Segregated statefile buckets?
+

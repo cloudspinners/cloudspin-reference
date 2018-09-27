@@ -1,0 +1,37 @@
+:source-highlighter: pygments
+
+= Setting up your local development environment
+
+I develop and test this stuff using a Mac, so my examples tend to be based on this. Everything should work on Linux and even Windows, but you'll probably have to roll up your sleeves a bit to get it working for yourself. Pull requests to this document are welcome!
+
+Things you'll need to install:
+
+- https://aws.amazon.com/cli/[AWS CLI]
+- Ruby 2.4+
+
+You'll also need a decent editor.
+
+
+== Setting up on a Mac
+
+- AWS CLI (`brew install awscli`)
+- Ruby 2.4 or higher (I use https://rvm.io/[rvm])
+
+
+== Getting the source code
+
+Clone the https://github.com/cloudspinners/cloudspin-reference-examples[example source code from github]. These instructions normally assume you have cloned this to `~/projects/spin/cloudspin-reference-examples`.
+
+
+== Setting up each project
+
+For each cloudspin project, you will typically need to run `bundle install` before using it, to install Ruby dependencies that are used by the tools.
+
+[source,bash]
+----
+cd ~/projects/spin/cloudspin-reference-examples/01-basic-stack
+bundle install
+----
+
+
+You may also want to install `gem install cloudspin-stack` globally, to get the `stack` command-line tool. (I haven't found a convenient way to have this usable within a project without needing to run `bundle exec stack`).
