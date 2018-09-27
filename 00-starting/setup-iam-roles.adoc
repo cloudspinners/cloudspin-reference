@@ -2,6 +2,8 @@
 
 = Set up IAM roles
 
+(NOT UPDATED YET)
+
 == (2) Create an unprivileged user
 
 Create a user (for example, _spin_user_) with no privileges, but which has an API access key, but no console access.
