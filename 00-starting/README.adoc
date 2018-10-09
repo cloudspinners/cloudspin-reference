@@ -1,0 +1,5 @@
+:source-highlighter: pygments
+
+= Cloudspin Tutorial 00: Getting started
+
+This tutorial is about getting the basic tools and whatnot working so you can do the other tutorials. It includes an introduction to the "stack", which is the basic building block of cloudspin. And then it talks about setting up your local tools, AWS account, and then configuring your AWS account to use cloudspin, which involves applying some existing cloudspin code.

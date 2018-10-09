@@ -25,13 +25,14 @@ Create a file `00-statebucket/stack-statebucket-local.yaml` (you can copy `00-st
 ----
 instance:
   group: YOURNAME_sandbox
+
 resources:
-  aws_profile: YOUR_PROFILE
+  aws_profile: YOUR_BOOTSTRAP_CREDENTIALS_PROFILE
 ----
 
-_YOUR_PROFILE_ will be the profile of the bootstrap AWS API keys you created if you followed the steps in the link:00-starting/setup-aws.adoc[previous page].
+_YOUR_BOOTSTRAP_CREDENTIALS_PROFILE_ will be the name of the profile in `~/.aws/credentials` with the bootstrap AWS API keys you created if you followed the steps in the link:00-starting/setup-aws.adoc[previous page].
 
-The `group` setting doesn't matter too much. It's essentially an ID for your environment, which, in more complex setups, can be used to integrate different things together.
+The `group` setting doesn't matter too much. It's essentially an ID for your environment, which, in more complex setups, can be used to integrate different things together. It is also used in tags.
 
 
 === (2) Initialize the local project tooling
@@ -69,12 +70,15 @@ Now you should have an S3 bucket that can be used for storing Terraform state. Y
 
 
 === Did you do all that?
+[CAUTION]
+====
 
-If you've simply followed all of these instructions, you have potentially put yourself at risk. This project code could easily have been created by someone unscrupulous. Even if you trust me and know this is my project, someone else could have compromised my project code, and inserted code to exploit your AWS account.
+If you've simply followed all of these instructions without having a close look at the code they apply to your cloud account, you have potentially put yourself at risk. This project code could easily have been created by someone unscrupulous. Even if you trust me and know this is my project, someone else could have compromised my project code, and inserted code to exploit your AWS account.
 
 You should make it a habit to carefully vet code before you download and apply it.
 
 In this case, the Ruby gems will have been downloaded into your local Ruby library folder, and the Terraform code will have been downloaded to `./00-statebucket/.cloudspin`. I'd encourage you to review this code and make sure you're comfortable with what it does before running it.
+====
 
 
 == What next?

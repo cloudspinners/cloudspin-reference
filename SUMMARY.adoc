@@ -4,14 +4,14 @@
 
 ## Tutorials
 
-. link:00-starting/todo.adoc[Getting started]
-.. link:00-starting/README.adoc[Concept: What is a stack?]
+. link:00-starting/README.adoc[Getting started]
+.. link:00-starting/stack-concept.adoc[Concept: What is a stack?]
 .. link:00-starting/setup-workstation.adoc[Set up your local tools]
 .. link:00-starting/setup-aws.adoc[Bootstrap your AWS account]
 .. link:00-starting/setup-statebucket.adoc[Set up a remote state bucket]
 .. link:00-starting/setup-iam-roles.adoc[Set up IAM roles]
 
-. link:01-basic-stack/todo.adoc[Tutorial 01 - creating a simple stack]
+. link:01-basic-stack/README.adoc[Tutorial 01 - creating a simple stack]
 .. link:01-basic-stack/stack-starting.adoc[Creating a simple stack]
 .. link:01-basic-stack/stack-testing.adoc[Testing the simple stack]
 
