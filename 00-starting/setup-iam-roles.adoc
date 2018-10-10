@@ -2,104 +2,119 @@
 
 = Set up IAM roles
 
-(NOT UPDATED YET)
+In this part, you'll use the bootstrap user credentials created link:00-starting/setup-workstation.adoc[earlier] to create some IAM roles that can be used for further examples. You'll do this by creating an unprivileged IAM user, with credentials, that will be used to run the code by assuming IAM roles. You will then apply a stack (provided for you, but of course you'll look over the code before applying it) which will create IAM roles, and give your unprivileged user the right to assume those roles.
 
-== (2) Create an unprivileged user
-
-Create a user (for example, _spin_user_) with no privileges, but which has an API access key, but no console access.
+This is all done in the name of https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#delegate-using-roles[good security hygiene]. AWS has documentation that explains https://docs.aws.amazon.com/cli/latest/userguide/cli-roles.html[how assuming a role works].
 
 
-=== (2.1) Add the unprivileged user to the AWS credentials file
+== (1) Create an unprivileged user
+
+Create a user (for example, _spin_user_) in the IAM console. Do not add the user to any groups, and don't give it console access. Create an API access key and secret key for the user.
 
 
-File: `~/.aws/credentials`:
+=== (1.1) Add the unprivileged user to the AWS credentials file
+
+
+In file: `~/.aws/credentials`:
+
 [source,ini]
 ----
-[spin_YOURNAME]
+[spin_user]
 aws_access_key_id = AKIA........
 aws_secret_access_key = xxxxxxxxxxx
 ----
 
 
-## (3) Add the bootstrap user to the stack-instance-local.yaml file
+== (2) Apply the IAM role stack
 
-This should be temporary, only done in order to apply the iam-roles in the first place.
+=== (2.1) Configure the IAM role stack
 
-File: `./stack-instance-local.yaml`
+Create a file `00-iam-roles/stack-starter_roles-local.yaml` (you can copy `00-iam-roles/stack-starter_roles-local-example.yaml` as a starter), and edit it:
+
 [source,yaml]
 ----
-resources:
-  aws_profile: spin_bootstrap
-  assume_role_profile:
-  assume_role_arn:
+instance:
+  group: YOURNAME_sandbox // <1>
+
+terraform_backend:
+  bucket: statebucket-cloudspin-examples-XXXXXXXXXXXX // <2>
+
 parameters:
-  managed_stack_name: YOUR_STACK_HERE
   stack_manager_users:
-    - spin_YOURNAME
+    - YOUR_UNPRIVILEGED_IAM_USER_NAME // <3>
+
+resources:
+  aws_profile: YOUR_BOOTSTRAP_PROFILE // <4>
+----
+<1> This may be the same as the value you set for your statebucket in the previous page.
+<2> This should be the name of the bucket created in the previous page.
+<3> This is the name of the unprivileged IAM user you created in the steps above in this page.
+<4> This is the profile in your `~/.aws/credentials` file that you used for bootstrapping the statebucket. So these credentials have enough privileges to create IAM roles without needing to assume a role.
+
+
+=== (2.2) Apply the iam-roles stack
+
+The first time you do this, you'll need to initialize the tooling in the stack project folder `00-iam-roles`:
+
+[source,console]
+----
+bundle install
 ----
 
-You might also/instead define the `stack_manager_users` list in an `./environments/stack-instance-ENVIRONMENT.yaml` file, depending on how you plan to manage roles and environments. (At the moment, this stack doesn't do anything clever to support giving different rights to users rights in different environments.)
+Now you can plan the stack and make sure you're happy with what it will do:
 
-
-## (4) Apply the iam-roles stack
-
-Once you have this all in place, you can plan and provision the stack. Do this by applying the stack, setting environment variables to use the bootstrap credentials.
 
 [source,console]
 ----
 rake plan
+----
+
+
+Then run the thing:
+
+[source,console]
+----
 rake up
 ----
 
-## (5) Replace the bootstrap configuration with the unprivileged user configuration
 
-In your `~/.aws/credentials`:
+=== (2.3) What happened?
 
-[source,ini]
-----
-[spin_YOURNAME]
-aws_access_key_id = AKIA........
-aws_secret_access_key = xxxxxxxxxxx
-----
+This should have created three IAM roles in your AWS account:
 
-Add an assume-role profile to your `~/.aws/config`:
+.Table IAM Roles
+|===
+| spin_role-cloudspin_examples-account | Used to manage IAM roles, policies, etc.
+| spin_role-cloudspin_examples-delivery | Used to manage resources that support delivery, e.g. pipelines, S3 buckets, etc.
+| spin_role-cloudspin_examples-manager | Used to manage basic stacks
+|===
 
-[source,ini]
-----
-[profile assume-IAM_ROLE-YOUR_STACK]
-role_arn = arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/spin_role-YOUR_STACK-ROLE
-source_profile = IAM_USER_PROFILE_FROM_YOUR_CREDENTIALS_FILE
-----
 
-For example:
+== (3) Switch over to using the managed IAM roles
+
+In the steps above you used a privileged "bootstrap" IAM user to apply the stack. But the point of creating the IAM roles is so you can use "assume role" rather than using the privileged account. 
+
+Add an assume-role profile to the file `~/.aws/config`:
 
 [source,ini]
 ----
-[profile assume-spin_network-manager]
-role_arn = arn:aws:iam::000000000000:role/spin_role-spin_network-manager
-source_profile = spin_YOURNAME
+[profile assume-cloudspin_examples-account]
+role_arn = arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/spin_role-cloudspin_examples-account
+source_profile = spin_user // <1>
 ----
+<1> This is the profile for the unprivileged user you added to `~/.aws/credentials` earlier on this page.
 
-Then in your stack configuration:
 
-File: `./stack-instance-local.yaml`
+Then in your local configuration file `./stack-starter_roles-local.yaml`, replace the bootstrap profile configuration with the configuration that will assume the newly created IAM role instead:
+
 [source,yaml]
 ----
 resources:
-  aws_profile: spin_YOURNAME
-  assume_role_profile: assume-YOUR_STACK_HERE-manager
-  assume_role_arn: arn:aws:iam::000000000000:role/spin_role-spin_network-manager
-parameters:
-  managed_stack_name: YOUR_STACK
-  stack_manager_users:
-    - spin_YOURNAME
+  aws_profile: spin_user // <1>
+  assume_role_profile: assume-cloudspin_examples-account
+  assume_role_arn: arn:aws:iam::XXXXXXXXXXXX:role/spin_role-cloudspin_examples-account
 ----
 
-## (6) Test it
+=== (3.1) Testing it
 
-(Note: this currently requires doing the previous configuration step for role *spin_role-spin_network-manager* account, as it requires some extra permissions to run these tests)
-
-[source,bash]
-----
-rake test
-----
+We need a nice spec for this. A rough way to test is to run `rake plan`, expecting it will show that nothing will be changed.
