@@ -6,10 +6,11 @@ site: ## Build the site into the cloudspinners.github.io folder
 			--exclude .git\
 			--exclude .gitignore \
 			--exclude CNAME \
+			--exclude Makefile \
 			--delete \
-			./cloudspin-reference/_book/ \
-			./cloudspinners.github.io/
-	@echo "Now commit and push the files that are in ./cloudspinners.github.io"
+			./_book/ \
+			../cloudspinners.github.io/
+	@echo "Now commit and push the files that are in ../cloudspinners.github.io"
 
 preview: ## Run a local server with the working site content
 	gitbook serve
