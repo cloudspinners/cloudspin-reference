@@ -9,7 +9,7 @@ This is all done in the name of https://docs.aws.amazon.com/IAM/latest/UserGuide
 
 == (1) Create an unprivileged user
 
-Create a user (for example, _spin_user_) in the IAM console. Do not add the user to any groups, and don't give it console access. Create an API access key and secret key for the user.
+Create a user (for example, _cloudspin_user_) in the IAM console. Do not add the user to any groups, and don't give it console access. Create an API access key and secret key for the user.
 
 
 === (1.1) Add the unprivileged user to the AWS credentials file
@@ -19,7 +19,7 @@ In file: `~/.aws/credentials`:
 
 [source,ini]
 ----
-[spin_user]
+[cloudspin_user]
 aws_access_key_id = AKIA........
 aws_secret_access_key = xxxxxxxxxxx
 ----
@@ -36,19 +36,20 @@ Create a file `00-iam-roles/stack-starter_roles-local.yaml` (you can copy `00-ia
 instance:
   group: YOURNAME_sandbox // <1>
 
-terraform_backend:
-  bucket: statebucket-cloudspin-examples-XXXXXXXXXXXX // <2>
-
 parameters:
   stack_manager_users:
-    - YOUR_UNPRIVILEGED_IAM_USER_NAME // <3>
+    - YOUR_UNPRIVILEGED_IAM_USER_NAME // <2>
+
+terraform_backend:
+  bucket: statebucket-cloudspin-examples-XXXXXXXXXXXX // <3>
+  profile: YOUR_BOOTSTRAP_PROFILE // <4>
 
 resources:
   aws_profile: YOUR_BOOTSTRAP_PROFILE // <4>
 ----
 <1> This may be the same as the value you set for your statebucket in the previous page.
-<2> This should be the name of the bucket created in the previous page.
-<3> This is the name of the unprivileged IAM user you created in the steps above in this page.
+<2> This is the name of the unprivileged IAM user you created in the steps above in this page.
+<3> This should be the name of the bucket created in the previous page.
 <4> This is the profile in your `~/.aws/credentials` file that you used for bootstrapping the statebucket. So these credentials have enough privileges to create IAM roles without needing to assume a role.
 
 
@@ -100,7 +101,7 @@ Add an assume-role profile to the file `~/.aws/config`:
 ----
 [profile assume-cloudspin_examples-account]
 role_arn = arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/spin_role-cloudspin_examples-account
-source_profile = spin_user // <1>
+source_profile = cloudspin_user // <1>
 ----
 <1> This is the profile for the unprivileged user you added to `~/.aws/credentials` earlier on this page.
 
@@ -109,11 +110,23 @@ Then in your local configuration file `./stack-starter_roles-local.yaml`, replac
 
 [source,yaml]
 ----
+terraform_backend:
+  bucket: statebucket-cloudspin-examples-XXXXXXXXXXXX
+  profile: YOUR_UNPRIVILEGED_PROFILE // <1>
+  role_arn: arn:aws:iam::XXXXXXXXXXXX:role/spin_role-cloudspin_examples-account // <2>
+
 resources:
-  aws_profile: spin_user // <1>
-  assume_role_profile: assume-cloudspin_examples-account
-  assume_role_arn: arn:aws:iam::XXXXXXXXXXXX:role/spin_role-cloudspin_examples-account
+  aws_profile: YOUR_UNPRIVILEGED_PROFILE // <1>
+  assume_role_profile: assume-cloudspin_examples-account // <3>
+  assume_role_arn: arn:aws:iam::XXXXXXXXXXXX:role/spin_role-cloudspin_examples-account // <4>
 ----
+<1> The profile for the unprivileged user you added to `~/.aws/credentials` earlier on this page.
+<2> The ARN for the profile to assume for write access to the S3 statebucket.
+<3> The name of the profile in your `~/.aws/config`, as described above, which indicates the role terraform should assume to manage infrastructure.
+<4> The ARN for the profile terraform should assume.
+
+At the moment, these examples use a highly privileged role for both of these things. These should be split out - a role that has just enough permissions for the S3 statebucket, and another role that has more specific permissions for this particular project.
+
 
 === (3.1) Testing it
 
