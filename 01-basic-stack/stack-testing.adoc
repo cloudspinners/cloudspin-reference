@@ -15,7 +15,7 @@ You need to declare a _Cloudspin::Stack::Rake::InspecTask_ object in the rakefil
 ----
 include Cloudspin::Stack::Rake
 
-stack = StackTask.new(id: 'test-network').instance
+stack = StackTask.new.instance
 InspecTask.new(stack_instance: stack)
 ----
 
@@ -36,7 +36,7 @@ rake up       # Create or update stack test-network
 
 In the example project, this simply checks that the VPC with the expected name exists.
 
-[source,bash]
+[source,console]
 ----
 $ rake inspec
 mkdir -p ./work/inspec
@@ -56,9 +56,10 @@ Test Summary: 1 successful, 0 failures, 0 skipped
 
 ## Writing inspec tests
 
-See the inspec documentation for details on organizing and writing Inspec controls. One bit of support that the cloudspin inspec rake task provides is passing parameters to the inspec controls. By default, all of the stack parameters are made available as attributes within the control.
+See the https://www.inspec.io/docs/[inspec documentation] for details on organizing and writing Inspec controls. One bit of support that the cloudspin inspec rake task provides is passing parameters to the inspec controls. By default, all of the stack parameters are made available as attributes within the control.
 
 The example uses the _stack_instance_id_:
+
 
 [source,ruby]
 ----

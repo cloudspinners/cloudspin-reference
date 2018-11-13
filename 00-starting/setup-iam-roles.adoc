@@ -29,7 +29,7 @@ aws_secret_access_key = xxxxxxxxxxx
 
 === (2.1) Configure the IAM role stack
 
-Create a file `00-iam-roles/stack-starter_roles-local.yaml` (you can copy `00-iam-roles/stack-starter_roles-local-example.yaml` as a starter), and edit it:
+Create a file `00-iam-roles/stack-instance-local.yaml` (you can copy `00-iam-roles/stack-instance-local-example.yaml` as a starter), and edit it:
 
 [source,yaml]
 ----
@@ -106,7 +106,7 @@ source_profile = cloudspin_user // <1>
 <1> This is the profile for the unprivileged user you added to `~/.aws/credentials` earlier on this page.
 
 
-Then in your local configuration file `./stack-starter_roles-local.yaml`, replace the bootstrap profile configuration with the configuration that will assume the newly created IAM role instead:
+Then in your local configuration file `./stack-instance-local.yaml`, replace the bootstrap profile configuration with the configuration that will assume the newly created IAM role instead:
 
 [source,yaml]
 ----

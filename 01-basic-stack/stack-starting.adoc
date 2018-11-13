@@ -4,21 +4,20 @@
 
 This section examines the basic parts of a cloudspin stack definition project, and the basic lifecycle of a stack instance.
 
-See link:examples-setup.adoc[the setup instructions] for what you need to install and configure to be ready to run this example.
+See link:/00-starting/README.adoc[the setup instructions] for what you need to install and configure to be ready to run this example.
 
 ## The example source code
 
-This is in the folder examples/01-basic-stack, available from github at https://github.com/cloudspinners/cloudspin-reference/tree/master/part1/examples/01-basic-stack
+This is in the folder examples/01-basic-stack, available from github at https://github.com/cloudspinners/cloudspin-reference-examples/tree/master/01-basic-stack
 
-This stack simply creates a VPC, and private and public subnets. It isn't particularly useful on its own, since it has no gateways (internet gateway for inbound access, or NAT gateway for outbound), and doesn't even have routes for traffic within the VPC. But it's a start.
+This stack simply creates a VPC, and private and public subnets. It isn't particularly useful on its own, since it has no gateways (internet gateway for inbound access, or NAT gateway for outbound), and doesn't even have routes for traffic within the VPC. But it's a start, and illustrates the moving parts of a stack.
 
 
 ## The stack definition source
 
 The `./src` subfolder of the project contains the Terraform files which are used to create instances of the stack.
 
-This is a standard Terraform project, you could run the terraform command in it, assuming you provide the required variable, and that you have valid aws credentials as the default profile in `~/.aws/credentials`, or in the relevant evironment variables:
-
+This is a standard Terraform project. So you could run the terraform command in it, assuming you provide the required variable, and that your default AWS credentials have enough permissions. 
 
 [source,console]
 ----
@@ -27,29 +26,66 @@ terraform init
 terraform plan -var instance_identifier=basic-01-manual
 ----
 
-The output should include (among lots of other output) something like:
+[NOTE]
+====
+If you have followed the setup instructions from this tutorial, and don't happen to have a default AWS profile with enough permissions, then the above example command will probably fail:
 
 [source,console]
 ----
-An execution plan has been generated and is shown below.
-Resource actions are indicated with the following symbols:
-  + create
+Error: Error running plan: 1 error(s) occurred:
 
-Terraform will perform the following actions:
-
-... <lots of stuff> ...
-
-Plan: 7 to add, 0 to change, 0 to destroy.
+* provider.aws: No valid credential sources found for AWS Provider.
+  Please see https://terraform.io/docs/providers/aws/index.html for more information on
+  providing credentials for the AWS Provider
 ----
 
-Cloudstack provides some tooling to run Terraform. For this example, there's no obvious value, but when you start doing more complicated things, this becomes handier. So let's start using it even for this simple stack, to build an understanding of how it works.
+This is a feature, not a bug! The examples in this tutorial all follow the security Best Practice(TM) of requiring you to assume a role to carry out privileged actions. The cloudspin tools make this easy for you - read on.
+====
 
 
-## Using the command line tool
+Cloudspin provides some tooling to run Terraform. For this example, there's not much obvious value, but when you start doing more complicated things, this becomes handier. So let's start using it even for this simple stack, to build an understanding of how it works.
+
+
+## The STACK command line tool
 
 The `stack` command-line tool, included in the `cloudspin-stack` gem, can be used to manage stack instances from a stack definition. The main benefit it adds over using the terraform command directly is that it follows certain conventions for finding and passing parameters to an instance, that will make it easier to manage multiple instances from a single stack definition in a consistent way. It also follows conventions for files are organized in the project.
 
-For the example stack, change back into the base folder of the example code (`cd ..` if you ran the commands above), and run the `up` command with the `--dry` option to see the terraform command that will be run:
+
+### Configuring your stack instance
+
+The stack tool reads configuration files to find parameters to pass to the terraform command, including the AWS credentials profiles to use. There are two configuration files it looks at.
+
+`stack-instance-defaults.yaml` is included with the project source from the git repository. As the name says, it sets default configurations. But this isn't enough, you need to override some of these for your own stack instance. To do this, create the second configuration file, `stack-instance-local.yaml`. You can copy the provided example file to start from:
+
+
+[source,console]
+----
+$ cp stack-instance-local-example.yaml stack-instance-local.yaml
+----
+
+Then edit the file, and replace the example values with your own:
+
+[source,yaml]
+----
+terraform_backend:
+  bucket: statebucket-cloudspin-examples-XXXXXXXXXXXX
+  profile: YOUR_UNPRIVILEGED_PROFILE
+  assume_role_arn: arn:aws:iam::XXXXXXXXXXXX:role/spin_role-cloudspin_examples-account
+
+resources:
+  aws_profile: YOUR_UNPRIVILEGED_PROFILE
+  assume_role_profile: assume-cloudspin_examples-account
+  assume_role_arn: arn:aws:iam::XXXXXXXXXXXX:role/spin_role-cloudspin_examples-account
+----
+
+Use the values from the tutorial setup instructions for these.
+
+The file `stack-instance-local.yaml` is not committed to git (it is listed in the .gitignore file in the base of the examples repository). This lets you set configuration options that are specific to your own instance, so that you and other members of your team can each have your own configuration without conflicts.
+
+
+### Using the command line tool
+
+For the basic stack, change back into the base folder of the example code (`cd ..` if you ran the raw terraform command in the example earlier), and run the `up` command with the `--dry` option to see the terraform command that will be run:
 
 [source,console]
 ----
@@ -61,7 +97,8 @@ The output should be similar to:
 [source,console]
 ----
 $ stack up --dry
-cd ./work && terraform apply -var 'region=eu-west-1' -var 'availability_zones=eu-west-1a,eu-west-1b,eu-west-1c' -var 'instance_identifier=basic-stack-01' -state=/Users/you/cloudspin-reference/part1/examples/01-basic-stack/state/stack-basic-stack-01.tfstate
+cd ./work/basic-stack-01 && terraform init -backend=true -backend-config 'region=eu-west-1' -backend-config 'encrypt=true' -backend-config 'bucket=statebucket-cloudspin-examples-084751902934' -backend-config 'profile=YOUR_UNPRIVILEGED_PROFILE' -backend-config 'role_arn=arn:aws:iam::084751902934:role/spin_role-cloudspin_examples-manager' -backend-config 'key=basic-stack-01.tfstate'
+cd ./work/basic-stack-01 && terraform apply -var 'region=eu-west-1' -var 'availability_zones=eu-west-1a,eu-west-1b,eu-west-1c' -var 'aws_profile=YOUR_UNPRIVILEGED_PROFILE' -var 'assume_role_profile=assume-cloudspin_examples-manager' -var 'assume_role_arn=arn:aws:iam::084751902934:role/spin_role-cloudspin_examples-manager' -var 'instance_identifier=basic-stack-01'
 ----
 
 Here you can see that, rather than running the project within the ./src folder, the stack tool copies the source code to another folder, and also stores the local state in a folder it creates. This helps later when creating multiple instances, so that each instance has its own copy of relevant files, rather than stepping on one another and potentially losing state.
@@ -73,9 +110,49 @@ You can run the terraform plan command by passing the `--plan` parameter to the 
 stack up --plan
 ----
 
-The output for this should be similar to when you ran terraform earlier.
+The output for this should include (among other stuff):
 
-To destroy the stack, run `stack down`. You can optionally pass `--dry` to see the terraform command that will be run, and/or `--plan`, to see the changes that will be made to destroy the stack.
+[source,console]
+----
+Plan: 7 to add, 0 to change, 0 to destroy.
+----
+
+Then you can actually create the stack by running `stack up` without any arguments:
+
+[source,console]
+----
+stack up
+----
+
+The output should end with something like:
+
+[source,console]
+----
+Apply complete! Resources: 7 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+availability_zones = eu-west-1a,eu-west-1b,eu-west-1c
+number_of_availability_zones = 3
+private_subnet_cidr_blocks = 10.1.3.0/24,10.1.4.0/24,10.1.5.0/24
+private_subnet_ids = subnet-xxxxxxxxxxxxxxxxx,subnet-xxxxxxxxxxxxxxxxx,subnet-xxxxxxxxxxxxxxxxx
+public_subnet_cidr_blocks = 10.1.0.0/24,10.1.1.0/24,10.1.2.0/24
+public_subnet_ids = subnet-xxxxxxxxxxxxxxxxx,subnet-xxxxxxxxxxxxxxxxx,subnet-xxxxxxxxxxxxxxxxx
+vpc_cidr = 10.1.0.0/16
+vpc_id = vpc-xxxxxxxxxxxxxxxxx
+----
+
+To destroy the stack, run `stack down`. You can optionally pass `--dry` to see the terraform command that will be run, or `--plan`, to see the changes that will be made to destroy the stack.
+
+[source,console]
+----
+stack down --dry
+----
+
+[source,console]
+----
+stack down --plan
+----
 
 [source,console]
 ----
@@ -126,7 +203,7 @@ The Rakefile has the logic of the builds. The basic elements for using cloudspin
 ----
 require 'cloudspin/stack/rake'
 
-Cloudspin::Stack::Rake::StackTask.new(id: 'test-network').instance
+Cloudspin::Stack::Rake::StackTask.new
 ----
 
 This names the stack instance that will be created *test-network*. When you list the available rake tasks from the command line you see what cloudspin has added:
@@ -134,18 +211,22 @@ This names the stack instance that will be created *test-network*. When you list
 [source,bash]
 ----
 $ rake -T
-rake down  # Destroy stack test-network
-rake dry   # Show command line to be run for stack test-network
-rake plan  # Plan changes to stack test-network
-rake up    # Create or update stack test-network
+rake down    # Destroy stack instance
+rake dry     # Show command line to be run for stack instance
+rake inspec  # Run inspec tests
+rake plan    # Plan changes to stack instance
+rake up      # Create or update stack instance
 ----
 
 You can see these are variations of the command line tool commands seen above. You have *up* and *down* to create/update and destroy the stack instance. The *dry* and *plan* tasks are applied to the *up* command.
 
+If your project has a subfolder named `test` - as the examples in this tutorial all should - then there is also an `inspec` target, which is the topic of the link:stack-testing.adoc[the next page].
+
 
 ### Adding a clean task
 
-The benefit of using rake is you can add more capabilities. You can easily import the capability for rake to clean up working directories for you:
+A benefit of using rake over the stack tool is you can easily incorporate more capabilities (if you don't mind writing ruby & rake code). For example, add the capability for rake to clean up working directories for you:
+
 
 [source,ruby]
 ----
@@ -155,8 +236,7 @@ require 'cloudspin/stack/rake'
 CLEAN.include('work')
 CLOBBER.include('state')
 
-Cloudspin::Stack::Rake::StackTask.new(id: 'test-network').instance
+Cloudspin::Stack::Rake::StackTask.new
 ----
 
-With this, running `rake clean` will remove the *work* directory, which contains the working files used for the instance. `rake clobber` takes the more drastic step of also deleting the *state* directory, which deletes the local statefile. You should only run this after successfully running `rake down`, otherwise your stack instance will remain in the cloud, and you will no longer be able to use cloudspin (or terraform) to manage it.
-
+With this, running `rake clean` will remove the *work* directory, which contains the working files used for the instance. `rake clobber` takes the more drastic step of also deleting the local *state* directory, which would delete the local statefile if there was one. For the examples in this tutorial clobber won't have any effect, because they all use remote state.
