@@ -15,7 +15,7 @@
 .. link:01-basic-stack/stack-starting.adoc[Creating a simple stack]
 .. link:01-basic-stack/stack-testing.adoc[Testing the simple stack]
 
-. link:02-environments/todo.adoc[Tutorial 02 - multiple environments]
+. link:02-environments/README.adoc[Tutorial 02 - multiple environments]
 .. link:02-environments/stack-multiple-instances.adoc[Creating multiple stack instances]
 .. link:02-environments/stack-parameters.adoc[Using parameters for stack instances]
 

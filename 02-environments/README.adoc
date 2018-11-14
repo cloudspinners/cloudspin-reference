@@ -1,0 +1,15 @@
+:source-highlighter: pygments
+
+= Cloudspin Tutorial 02: Creating multiple environments
+
+The purpose of this tutorial is to see how to provision and manage multiple environments for a given stack definition. This can be used for a number of things:
+
+- Create consistent environments that can be used to deploy and test applications, progressing them from development, test, through to production.
+- Test changes to the infrastructure code itself, progressing it through environments.
+- Create different instances of a stack, for different purposes. For example, different instances of an application server stack can be used to deploy different applications.
+
+
+== Prerequisites
+
+This tutorial assumes you've got the link:/00-starting/README.adoc[Getting started] steps working. Those give you IAM roles that you can assume to carry out the tasks, and an encrypted S3 bucket for storing Terraform state.
+

@@ -4,5 +4,8 @@
 
 The purpose of this tutorial is to explore how a stack is created and managed with the cloudspin tooling. A stack is the fundamental building block of infrastructure, at least according to the cloudspin view of the world. So this tutorial familiarizes you with the fundamentals.
 
-Of course, this tutorial assumes you've done the link:/00-starting/README.adoc[Getting started] steps, and that they've worked well enough. 
+
+== Prerequisites
+
+This tutorial assumes you've got the link:/00-starting/README.adoc[Getting started] steps working. Those give you IAM roles that you can assume to carry out the tasks, and an encrypted S3 bucket for storing Terraform state.
 

@@ -6,9 +6,9 @@ This section walks through an example stack project that has multiple environmen
 
 ## The example source code
 
-The example project is in the folder examples/02-multiple-stacks, available from github at https://github.com/cloudspinners/cloudspin-reference/tree/master/part1/examples/02-multiple-stacks.
+The example project is in the folder examples/02-multiple-stacks, available from github at https://github.com/cloudspinners/cloudspin-reference/tree/master/02-environments.
 
-This project creates some networking structures, just like the 01-simple-stack project, although it adds a _EnvironmentName_ tag to the resources.
+This project creates some networking structures, just like the _01-basic-stack_ project, although it adds an `EnvironmentName` tag to the resources.
 
 
 ## Environment configuration options
@@ -19,34 +19,64 @@ This project adds some new parameters to the `stack-instance-defaults.yaml` file
 ----
 instance:
   group: NOT_SET
+
 parameters:
-  region: "eu-west-1"
-  availability_zones: "eu-west-1a,eu-west-1b,eu-west-1c"
   environment_name: NOT_SET
+  region: eu-west-1
+  availability_zones: "eu-west-1a,eu-west-1b,eu-west-1c"
 ----
 
 `parameters:environment_name` is passed to terraform, so it can be assigned to resource tags. This is purely a convention - nothing in cloudspin itself insists on this.
 
 `instance:group` is used by the cloudspin tools to build unique a `instance_identifier` for each stack instance. Before, the instance_identifier was set to *`STACK_NAME`*, which was taken from the _stack:name_ options set in the stack definition file `./src/stack-definition.yaml`. Now, _instance:group_ is added to it, so the the instance_identifier is set to *`STACK_NAME-INSTANCE_GROUP`*.
 
-In this example, the stack name is _example2_, so if you were to run `stack up`, it would use `instance_identifier=example2-NOT_SET`.
 
+### Create your local stack instance configuration
+
+As with the previous tutorial, you need to create a local configuration file so the cloudspin tools can access your AWS account. You can copy the example configuration file:
+
+[source,console]
+----
+$ cp stack-instance-local-example.yaml stack-instance-local.yaml
+----
+
+And then edit the file to match your account details.
+
+
+## "Local" stack instance
+
+You can use the `stack` command as in the previous tutorial to manage your own instance of the stack.
 
 [source,console]
 ----
 $ stack up --dry
-cd /Users/you/spin/cloudspin-reference/part1/examples/02-multiple-stacks/work/example2-NOT_SET && terraform apply -var 'region=eu-west-1' -var 'availability_zones=eu-west-1a,eu-west-1b,eu-west-1c' -var 'environment_name=NOT_SET' -var 'aws_profile=my-cloudspin-user' -var 'assume_role_profile=assume-my-cloudspin-role' -var 'assume_role_arn=arn:aws:iam::000000000000:role/my-cloudspin-iam-role' -var 'instance_identifier=example2-NOT_SET' -state=/Users/you/spin/cloudspin-reference/part1/examples/02-multiple-stacks/state/example2-NOT_SET/stack-example2-NOT_SET.tfstate
 ----
+
+The output should look something like:
+
+[source,console]
+----
+cd /YOUR_PROJECT_FOLDER/02-environments/work/example2-NOT_SET && terraform init -backend=true -backend-config 'region=eu-west-1' -backend-config 'encrypt=true' -backend-config 'bucket=statebucket-cloudspin-examples-xxxxxxxxxxxx' -backend-config 'profile=YOUR_UNPRIVILEGED_PROFILE' -backend-config 'role_arn=arn:aws:iam::xxxxxxxxxxxx:role/spin_role-cloudspin_examples-manager' -backend-config 'key=example2-NOT_SET.tfstate'
+cd /YOUR_PROJECT_FOLDER/02-environments/work/example2-NOT_SET && terraform apply -var 'region=eu-west-1' -var 'availability_zones=eu-west-1a,eu-west-1b,eu-west-1c' -var 'environment_name=NOT_SET' -var 'aws_profile=YOUR_UNPRIVILEGED_PROFILE' -var 'assume_role_profile=assume-cloudspin_examples-manager' -var 'assume_role_arn=arn:aws:iam::xxxxxxxxxxxx:role/spin_role-cloudspin_examples-manager' -var 'instance_identifier=example2-NOT_SET'
+----
+
+The interesting bit here is the _environment_name_ variable: `environment_name=NOT_SET`, and the _instance_identifier_ variable: `instance_identifier=example2-NOT_SET`.
+
+The `stack-instance-defaults.yaml` file, as shown above, defines both the _environment_ and _group_ parameters to be `NOT_SET`. In order to have multiple stack instances, we'll need a way to override these.
+
+You can run `stack down` to destroy this stack instance.
 
 
 ## Environment configuration files
 
-It would be useful to set configuration options for multiple environments. This can be done by creating files in a folder called `./environments`, each file being named `stack-instance-ENVIRONMENT_NAME.yaml`.
+Configuration options for different environments can be set by creating files in a folder called `./environments`, each file being named `stack-instance-ENVIRONMENT_NAME.yaml`.
+
 
 [source,yaml]
 ----
 instance:
   group: sandbox
+
 parameters:
   environment_name: sandbox
 ----
@@ -55,13 +85,40 @@ This example overrides the _instance:group_ value and the _environment_name_ par
 
 To use this with the stack tool, use the -e flag to pass the ENVIRONMENT_NAME to the tool:
 
+
 [source,console]
 ----
 $ stack up --dry -e sandbox
-cd /Users/you/spin/cloudspin-reference/part1/examples/02-multiple-stacks/work/example2-sandbox && terraform apply -var 'region=eu-west-1' -var 'availability_zones=eu-west-1a,eu-west-1b,eu-west-1c' -var 'environment_name=sandbox' -var 'instance_identifier=example2-sandbox' -state=/Users/you/spin/cloudspin-reference/part1/examples/02-multiple-stacks/state/example2-sandbox/stack-example2-sandbox.tfstate
 ----
 
-The stack tool looks for the environment configuration file based on the name passed to the -e flag.
+The stack tool uses the environment string passed to it to find a file named `./environments/stack-instance-ENVIRONMENT.yaml`, which in this case is: `./environments/stack-instance-sandbox.yaml`. The output is something like:
+
+[source,console]
+----
+cd /YOUR_PROJECT_FOLDER/02-environments/work/example2-sandbox && terraform init -backend=true -backend-config 'region=eu-west-1' -backend-config 'encrypt=true' -backend-config 'bucket=statebucket-cloudspin-examples-xxxxxxxxxxxx' -backend-config 'profile=YOUR_UNPRIVILEGED_PROFILE' -backend-config 'role_arn=arn:aws:iam::xxxxxxxxxxxx:role/spin_role-cloudspin_examples-manager' -backend-config 'key=example2-sandbox.tfstate'
+cd /YOUR_PROJECT_FOLDER/02-environments/work/example2-sandbox && terraform apply -var 'region=eu-west-1' -var 'availability_zones=eu-west-1a,eu-west-1b,eu-west-1c' -var 'environment_name=sandbox' -var 'aws_profile=YOUR_UNPRIVILEGED_PROFILE' -var 'assume_role_profile=assume-cloudspin_examples-manager' -var 'assume_role_arn=arn:aws:iam::xxxxxxxxxxxx:role/spin_role-cloudspin_examples-manager' -var 'instance_identifier=example2-sandbox'
+----
+
+So you can see that the _environment_name_ variable passed to terraform is now `environment_name=sandbox`, and _instance_identifier_ is now `instance_identifier=example2-sandbox`.
+
+
+## Create multiple instances of the stack
+
+There are environment configuration files for two environments, _sandbox_ and _staging_. You can spin up an instance of each:
+
+
+[source,console]
+----
+stack up -e sandbox
+stack up -e staging
+----
+
+You can then see the VPCs in the AWS console, or by running the aws cli:
+
+[source,console]
+----
+aws ec2 describe-vpcs --profile assume-cloudspin_examples-manager --region eu-west-1
+----
 
 
 ## Rakefiles and multiple stack instances
@@ -77,7 +134,8 @@ include Cloudspin::Stack::Rake
 
 ['sandbox', 'staging'].each { |environment|
   namespace "#{environment}" do
-    StackTask.new(environment).instance
+    stack = StackTask.new(environment).instance
+    InspecTask.new(stack_instance: stack)
   end
 }
 ----
@@ -87,13 +145,43 @@ So the rake tasks are grouped by a namespace for each environment:
 [source,console]
 ----
 $ rake -T
-rake sandbox:down    # Destroy stack example2-sandbox
-rake sandbox:dry     # Show command line to be run for stack example2-sandbox
-rake sandbox:plan    # Plan changes to stack example2-sandbox
-rake sandbox:up      # Create or update stack example2-sandbox
-rake staging:down    # Destroy stack example2-staging
-rake staging:dry     # Show command line to be run for stack example2-staging
-rake staging:plan    # Plan changes to stack example2-staging
-rake staging:up      # Create or update stack example2-staging
+rake sandbox:down    # Destroy stack instance
+rake sandbox:dry     # Show command line to be run for stack instance
+rake sandbox:inspec  # Run inspec tests
+rake sandbox:plan    # Plan changes to stack instance
+rake sandbox:up      # Create or update stack instance
+rake staging:down    # Destroy stack instance
+rake staging:dry     # Show command line to be run for stack instance
+rake staging:inspec  # Run inspec tests
+rake staging:plan    # Plan changes to stack instance
+rake staging:up      # Create or update stack instance
 ----
+
+
+## Testing
+
+The testing story is pretty much the same. The StackTask class automatically adds inspec tasks for each stack instance, as long as it finds inspec controls in the `./test` folder. The inspec control code itself needs to use the _instance_identifier_ attribute to ensure it is testing the correct instance:
+
+
+[source,ruby]
+----
+instance_identifier = attribute('instance_identifier', description: 'Which stack to test')
+
+describe aws_vpc_list do
+  its('name') { should include "vpc-#{instance_identifier}" }
+end
+----
+
+## Cleaning up
+
+[source,console]
+----
+stack down -e sandbox
+stack down -e staging
+----
+
+
+## Doing more interesting things
+
+The main thing we've accomplished in this tutorial is the ability to create more than one stack instance from a single stack definition. The only difference with each instance is the two variables, _instance_identifier_ and _environment_name_, which only affect tagging. However, you can see how it would be possible to set other variables differently per environment. This would require adding the variables to the environment configuration files, and then adding the variables within the Terraform code to make use of these.
 
