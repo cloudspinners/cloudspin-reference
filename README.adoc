@@ -2,9 +2,9 @@
 
 Cloudspin is a collection of code I (Kief Morris) am using on to explore ways to structure and manage infrastructure as code projects. I am using it to help illustrate concepts, patterns, and practices from my book, http://infrastructure-as-code.com/book/[Infrastructure as Code], articles, and workshops. I am also using it with client teams I work with at https://thoughtworks.com[ThoughtWorks] to work out ideas for project structures and tooling.
 
-I'd like to see this evolve into a community-driven set of tools and template projects (replacing "I" with "we" in this documentation!) For the moment, I'm making fairly radical changes on an unpredictable basis (in flurries of activity), so it's likely to be inconsistent and even broken at times.
+This could potentiallly evolve into a community-driven set of tools and template projects (replacing "I" with "we" in this documentation!) For the moment, I'm making fairly radical changes on an unpredictable basis, so it's likely to be inconsistent and even broken at times.
 
-Feel free to copy and use material from here (subject to the terms of the MIT license), but you will need to modify and extend it to make it useful for your own project.
+Feel free to copy and use material from here (subject to the terms of the MIT license), but you will need to modify and extend it to make it useful for your own project. I am not currently maintaining this as a project that assumes people are using it directly, so there is no attempt to preserve backwards compatibility, provide upgrade paths. In other words, copy and use this stuff at your own risk.
 
 
 [NOTE]
@@ -14,11 +14,11 @@ The https://github.com/cloudspinners/[Cloudspinners repositories on Github] have
 
 == Why Cloudspin?
 
-Currently, most people and teams managing infrastructure with tools such as Terraform, CloudFormation, etc. define their own unique project structures, and write their own unique wrapper scripts (using make, shell, rake, or whatever) to run that tool and associated tasks. Essentially, each project is a special snowflake.
+Currently, most people and teams managing infrastructure with tools such as Terraform, CloudFormation, etc. define their own unique project structures, and write their own unique wrapper scripts (using make, shell, rake, or whatever) to run that tool and associated tasks. Essentially, each project is a special snowflake. Some tools (such as https://github.com/gruntwork-io/terragrunt[Terragrunt]), are emerging to create common structures and build tooling for infrastructure.
 
-The goal for cloudspin is to evolve a common structure and build tooling for infrastructure projects, focused on the lifecycle of "http://infrastructure-as-code.com/patterns/2018/03/28/defining-stacks.html[stacks]" - groups of infrastructure elements provisioned on dynamic infrastructure such as IaaS clouds.
+Cloudspin uses its own structure and tooling for building projects, in order to support the concepts I'm using it to work out. (As mentioned, these are changing and evolving without any attempt at consistency or support. Their purpose is exploration, not a product.) These are based around the lifecycle of "http://infrastructure-as-code.com/patterns/2018/03/28/defining-stacks.html[stacks]" - groups of infrastructure elements provisioned on dynamic infrastructure such as IaaS clouds.
 
-The hypothesis is that, with a common project structure and tooling, teams can:
+Over time, a more stable set of structures and tooling may emerge from this. The hypothesis is that, with a common project structure and tooling, teams can:
 
 - Spend less time creating and maintaining scaffolding, and more time on higher value work,
 - Bring new team members up to speed more quickly,
