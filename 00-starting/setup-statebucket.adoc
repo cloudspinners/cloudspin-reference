@@ -9,7 +9,7 @@ There are various ways to manage Terraform state, in our case, we will store it 
 
 == State for your statebucket
 
-Where does the statefile for the stack that manages your statefile bucket live? At the moment, this code manages the state for this locally.
+Where does the statefile for the stack that manages your statefile bucket live? Once you've created your bucket, you'll migrate your state to it. So the terraform state for the stack that manages your bucket lives within the bucket itself.
 
 
 == Planning and creating your statebucket
@@ -67,6 +67,76 @@ rake up
 ----
 
 Now you should have an S3 bucket that can be used for storing Terraform state. You'll need the name of the bucket to put into configuration for further examples. The name should be something like: `statebucket-cloudspin-examples-xxxxxxxxxxxx`, where the number at the end is your AWS account ID (which is needed to make sure the bucket name is globally unique).
+
+
+=== (5) Migrate your state to the bucket
+
+Now you need to migrate your terraform state, which is currently in a local folder (`./state/YOURNAME_sandbox`), to the S3 bucket. This will allow other people in your team to make changes to the statebucket stack.
+
+The process to do this (and keep in mind, this cloudspin tooling is for proof of concept, so this is clunkier than we'd like) is to edit your local configuration, including setting a temporary option to make the migration happen:
+
+
+[source,yaml]
+----
+instance:
+  group: YOURNAME_sandbox
+
+resources:
+  aws_profile: YOUR_UNPRIVEGED_CREDENTIALS_PROFILE
+  assume_role_profile: YOUR_ASSUME_DELIVERY_ROLE_PROFILE
+  assume_role_arn: arn:aws:iam::XXXXXXXXXXXX:role/spin_role-cloudspin_examples-delivery
+
+terraform_backend:
+  bucket: YOURNAME_sandbox-XXXXXXXXXXXX
+  profile: YOUR_UNPRIVEGED_CREDENTIALS_PROFILE
+  role_arn: arn:aws:iam::XXXXXXXXXXXX:role/spin_role-cloudspin_examples-manager
+  region: eu-west-1
+  encrypt: true
+  migrate: true
+----
+
+You can then run `rake dry` to see that there are no obvious errors. Unlike other actions, for migrating state from local to the remote bucket, the *plan* command _will make it happen!_ This is because the "plan" command uses the state, so it carries out changes to backend, although it still won't try to make changes to the infrastructure in the stack it actually manages.
+
+When you do run:
+
+[source,console]
+----
+rake plan
+----
+
+then you should expect to see the following in the output:
+
+[source,console]
+----
+Initializing the backend...
+
+Successfully configured the backend "s3"! Terraform will automatically
+use this backend unless the backend configuration changes.
+----
+
+This shows that the bucket will be used for state. At the end, you should also see:
+
+[source,console]
+----
+No changes. Infrastructure is up-to-date.
+----
+
+If instead you see that terraform will create all of the infrastructure elements, even though they already exist, then this usually means your state did not get migrated up to the s3 bucket.
+
+
+=== (6) Change your configuration to use the bucket for state
+
+This is the clunkiest part. You need to remove the `migrate` flag from your local configuration, so that cloudspin doesn't try to migrate old local state again.
+
+
+[source,yaml]
+----
+terraform_backend:
+  ...
+  # migrate: true
+----
+
+Comment out (or delete) this line from the file. The re-run `rake plan`, and make sure it's all happy. I tend to also move the local state folder somewhere else, and re-run `rake plan`, `rake up`, etc. to make sure it's all good.
 
 
 === Did you do all that?
