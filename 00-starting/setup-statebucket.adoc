@@ -82,14 +82,11 @@ instance:
   group: YOURNAME_sandbox
 
 resources:
-  aws_profile: YOUR_UNPRIVEGED_CREDENTIALS_PROFILE
-  assume_role_profile: YOUR_ASSUME_DELIVERY_ROLE_PROFILE
-  assume_role_arn: arn:aws:iam::XXXXXXXXXXXX:role/spin_role-cloudspin_examples-delivery
+  aws_profile: YOUR_BOOTSTRAP_CREDENTIALS_PROFILE
 
 terraform_backend:
   bucket: YOURNAME_sandbox-XXXXXXXXXXXX
-  profile: YOUR_UNPRIVEGED_CREDENTIALS_PROFILE
-  role_arn: arn:aws:iam::XXXXXXXXXXXX:role/spin_role-cloudspin_examples-manager
+  profile: YOUR_BOOTSTRAP_CREDENTIALS_PROFILE
   region: eu-west-1
   encrypt: true
   migrate: true
@@ -137,6 +134,28 @@ terraform_backend:
 ----
 
 Comment out (or delete) this line from the file. The re-run `rake plan`, and make sure it's all happy. I tend to also move the local state folder somewhere else, and re-run `rake plan`, `rake up`, etc. to make sure it's all good.
+
+
+=== (7) After IAM stack, switch to using the IAM roles
+
+The next step of this tutorial is to create IAM roles that are used to run terraform more securely. Once those have been created, you can switch this stack to use those roles by editing your `stack-instance-local.yaml` file for this statebucket stack:
+
+
+[source,yaml]
+----
+resources:
+  aws_profile: YOUR_UNPRIVEGED_CREDENTIALS_PROFILE
+  assume_role_profile: YOUR_ASSUME_DELIVERY_ROLE_PROFILE
+  assume_role_arn: arn:aws:iam::XXXXXXXXXXXX:role/spin_role-cloudspin_examples-delivery
+
+terraform_backend:
+  bucket: YOURNAME_sandbox-XXXXXXXXXXXX
+  profile: YOUR_UNPRIVEGED_CREDENTIALS_PROFILE
+  role_arn: arn:aws:iam::XXXXXXXXXXXX:role/spin_role-cloudspin_examples-manager
+  region: eu-west-1
+  encrypt: true
+  # migrate: true (or delete this line)
+----
 
 
 === Did you do all that?
